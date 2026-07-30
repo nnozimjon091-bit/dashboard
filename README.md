@@ -85,6 +85,60 @@ Birinchi ochilganda panel bo'sh turmasligi uchun demo ma'lumot ko'rsatiladi —
 bu haqda yuqorida ogohlantiruvchi qator chiqadi va birinchi o'z yozuvingizni
 kiritganingizda demo belgisi o'chadi.
 
+## Google Sheets'dan reklama ma'lumotini olish
+
+Targetolog to'ldiradigan jadvaldan kunlik sarf va lidlarni Reklama bo'limiga
+olib kirish mumkin. Jadval **transponirlangan** ko'rinishda kutiladi: sanalar
+ustun bo'lib yotadi, har bir soha uchun esa ko'rsatkichlar qator bo'lib
+takrorlanadi.
+
+```
+ №  | Campaigns name | Metrics                         | ... | 1Jul2026 | 2Jul2026
+ 1  | Dermatolog     | Reach                           |     |          |
+    |                | Lead soni (Result)              |     | 15       | 9
+    |                | Lead narxi (CPL)                |     | $0.72    | $1.11
+    |                | Sarflangan summa (Amount spent) |     | $10.73   | $9.99
+    |                | Conversion rate %               |     |          |
+```
+
+Parser qator raqamlariga bog'lanmagan — ustun sarlavhalari (`Campaigns name`,
+`Metrics`) va metrika nomlari bo'yicha topadi, shuning uchun jadvalga qator
+qo'shilsa ham buzilmaydi.
+
+| Jadvaldagi | Dashboardda |
+|---|---|
+| `Campaigns name` | kampaniya (soha) nomi |
+| sanalar qatori | yozuv sanasi |
+| `Lead soni (Result)` | lidlar |
+| `Sarflangan summa (Amount spent)` | xarajat |
+| nomida `(TG)` bor | platforma = Telegram, aks holda Meta |
+
+Sanalar `1Jul2026`, `01.07.2026` va `2026-07-01` ko'rinishlarida tushuniladi.
+Bo'sh kunlar uchun yozuv yaratilmaydi.
+
+### Ikki yo'l
+
+**1. Yopishtirish** — hech qanday sozlashsiz ishlaydi. Reklama sahifasida
+"Yopishtirib olish" → jadvalni oching → `Ctrl+A` → `Ctrl+C` → oynaga `Ctrl+V`.
+Ma'lumot serverga yuborilmaydi, hammasi brauzerda o'qiladi.
+
+**2. Havoladan avtomatik** — jadvalni `File → Share → Publish to web` orqali
+CSV qilib chiqaring va havolani `SHEETS_CSV_URL` o'zgaruvchisiga yozing
+(`.env.example` ga qarang). Shundan keyin "Havoladan olish" tugmasi yetarli.
+Sayt ochiq bo'lsa, `SHEETS_SYNC_PASSWORD` ni ham o'rnating.
+
+Ikkala yo'l ham bitta parserdan foydalanadi. Yozuvlar *sana + platforma +
+kampaniya* bo'yicha solishtiriladi: mavjudi yangilanadi, yangisi qo'shiladi —
+qayta-qayta olsangiz ham takror yig'ilmaydi.
+
+### Nimalar hisoblanmaydi
+
+Jadvalda ko'rsatish (impressions) va klik yo'q, shuning uchun **CTR, CPC va
+CPM** bo'sh qoladi. **CPL** esa jadvaldan olinmaydi — `xarajat ÷ lidlar`
+formulasi bilan qayta hisoblanadi, chunki dashboard davrlar bo'yicha jamlaganda
+o'rtacha CPL'ni to'g'ri chiqarishi kerak. Shu sababli u jadvaldagi qiymatdan
+bir necha sentga farq qilishi mumkin.
+
 ## Texnologiyalar
 
 - Next.js 16 (App Router) + React 19 + TypeScript
@@ -111,9 +165,11 @@ Kod ichida quyidagilarga qat'iy amal qilingan:
 ```
 src/
   app/                 sahifalar (App Router)
+    api/sheets/        publish qilingan CSV'ni o'qiydigan route
   components/          UI va grafik komponentlari
   lib/
     types.ts           ma'lumot modellari
+    sheet.ts           Google Sheets jadvalini o'qiydigan parser
     store.tsx          localStorage'ga bog'langan kontekst
     metrics.ts         sana, guruhlash va KPI hisoblari
     palette.ts         grafik ranglari (yorug'/qorong'i)

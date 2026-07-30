@@ -3,6 +3,7 @@
 import { ChartCard } from "@/components/chart-card";
 import { CategoryBarChart, ColumnChart, TrendChart } from "@/components/charts";
 import { NoData, NoDataInRange } from "@/components/no-data";
+import { SheetSync } from "@/components/sheet-sync";
 import { StatTile } from "@/components/stat-tile";
 import { Card, DataTable, PageHeader, SectionTitle } from "@/components/ui";
 import { compact, num, pct, usd, usdCompact, usdFine } from "@/lib/format";
@@ -89,6 +90,7 @@ export default function AdsPage() {
     return (
       <div className="space-y-5">
         <PageHeader title="Reklama" />
+        <SheetSync />
         <NoData />
       </div>
     );
@@ -100,6 +102,8 @@ export default function AdsPage() {
         title="Reklama"
         description="Kampaniyalar bo'yicha byudjet, trafik va lid narxi."
       />
+
+      <SheetSync />
 
       {isRangeEmpty ? (
         <NoDataInRange />
