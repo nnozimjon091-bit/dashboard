@@ -55,8 +55,9 @@ interface StoreValue {
   ) => void;
   removeEntry: (key: DatasetKey, id: string) => void;
   /**
-   * Meta Ads sinxronizatsiyasi uchun: sana + platforma + kampaniya bo'yicha
-   * mavjud yozuv topilsa ustiga yoziladi, topilmasa qo'shiladi.
+   * Tashqi manbadan (masalan Google Sheets) reklama yozuvlarini olib kirish:
+   * sana + platforma + kampaniya bo'yicha mavjudi topilsa ustiga yoziladi,
+   * topilmasa qo'shiladi — takroriy yozuv hosil bo'lmaydi.
    */
   importAds: (entries: Omit<AdEntry, "id">[]) => { added: number; updated: number };
   replaceAll: (next: DashboardData) => void;
