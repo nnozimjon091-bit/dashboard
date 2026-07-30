@@ -23,7 +23,9 @@ const THEME_OPTIONS: { value: ThemeChoice; label: string }[] = [
 ];
 
 export default function SettingsPage() {
-  const { data, isDemo, replaceAll, loadDemo, clearAll } = useStore();
+  // Eksport ham, statistika ham faqat sizning yozuvlaringiz ustida ishlaydi —
+  // demo ko'rinishi hech qachon faylga tushmaydi.
+  const { ownData: data, isDemo, replaceAll, loadDemo, clearAll } = useStore();
   const { choice, setChoice } = useTheme();
   const fileInput = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<{ tone: "ok" | "error"; text: string } | null>(
@@ -41,7 +43,7 @@ export default function SettingsPage() {
       setMessage({ tone: "error", text: result.error ?? "Faylni o'qib bo'lmadi." });
       return;
     }
-    replaceAll(result.data, false);
+    replaceAll(result.data);
     setMessage({ tone: "ok", text: "Ma'lumotlar fayldan tiklandi." });
   };
 
@@ -162,7 +164,19 @@ export default function SettingsPage() {
           hint="Bu amallarni ortga qaytarib bo'lmaydi"
         />
         <div className="flex flex-wrap items-center gap-2">
-          <Button onClick={loadDemo}>Demo ma'lumotni yuklash</Button>
+          {/* Demo — ko'rinish rejimi: o'z yozuvlaringiz bo'lsa, u ularni
+              yashirib qo'ymasligi uchun tugma o'chirilgan turadi. */}
+          <Button
+            onClick={loadDemo}
+            disabled={total > 0 || isDemo}
+            title={
+              total > 0
+                ? "Avval o'z ma'lumotingizni o'chiring"
+                : "Demo ko'rinishini qaytarish"
+            }
+          >
+            Demo ko'rinishini qaytarish
+          </Button>
           {confirmClear ? (
             <>
               <Button

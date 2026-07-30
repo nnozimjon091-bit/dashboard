@@ -77,7 +77,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </header>
 
         <main id="asosiy" className="mx-auto max-w-[1400px] px-4 py-5 sm:px-6">
-          {isDemo ? <DemoBanner onClear={clearAll} /> : null}
+          {hydrated && isDemo ? <DemoBanner onClear={clearAll} /> : null}
           {hydrated ? children : <LoadingSkeleton />}
         </main>
       </div>

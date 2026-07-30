@@ -56,7 +56,9 @@ export function EntryPanel<K extends DatasetKey>({
 }: {
   config: DatasetConfig<K>;
 }) {
-  const { data, addEntry, updateEntry, removeEntry } = useStore();
+  // Bu ro'yxatda faqat siz kiritgan yozuvlar bo'ladi — demo hech qachon
+  // bu yerga tushmaydi, aks holda uni tahrirlashga urinib bo'lardi.
+  const { ownData, addEntry, updateEntry, removeEntry } = useStore();
   const [values, setValues] = useState<Values>({
     date: todayISO(),
     ...config.defaults,
@@ -64,7 +66,7 @@ export function EntryPanel<K extends DatasetKey>({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const rows = [...data[config.dataset]].sort((a, b) =>
+  const rows = [...ownData[config.dataset]].sort((a, b) =>
     b.date.localeCompare(a.date),
   ) as DashboardData[K][number][];
 
