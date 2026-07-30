@@ -13,6 +13,7 @@ import {
 } from "react";
 import {
   EMPTY_DATA,
+  type AdEntry,
   type DashboardData,
   type DatasetKey,
 } from "./types";
@@ -41,6 +42,11 @@ interface StoreValue {
     patch: Partial<Entry<K>>,
   ) => void;
   removeEntry: (key: DatasetKey, id: string) => void;
+  /**
+   * Meta Ads sinxronizatsiyasi uchun: sana + platforma + kampaniya bo'yicha
+   * mavjud yozuv topilsa ustiga yoziladi, topilmasa qo'shiladi.
+   */
+  importAds: (entries: Omit<AdEntry, "id">[]) => { added: number; updated: number };
   replaceAll: (next: DashboardData, demo?: boolean) => void;
   loadDemo: () => void;
   clearAll: () => void;
@@ -152,6 +158,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [dropDemoFlag],
   );
 
+  const importAds = useCallback(
+    (entries: Omit<AdEntry, "id">[]) => {
+      // Hisoblash setData ichida emas, joriy holat ustida bajariladi —
+      // StrictMode updater'ni ikki marta chaqirsa ham son ikkilanmaydi.
+      const next = [...data.ads];
+      let added = 0;
+      let updated = 0;
+
+      entries.forEach((entry) => {
+        const index = next.findIndex(
+          (row) =>
+            row.date === entry.date &&
+            row.platform === entry.platform &&
+            row.campaign === entry.campaign,
+        );
+        if (index >= 0) {
+          next[index] = { ...next[index], ...entry };
+          updated += 1;
+        } else {
+          next.push({ ...entry, id: newId() });
+          added += 1;
+        }
+      });
+
+      if (added > 0 || updated > 0) {
+        setData((current) => ({ ...current, ads: next }));
+        dropDemoFlag();
+      }
+      return { added, updated };
+    },
+    [data.ads, dropDemoFlag],
+  );
+
   const replaceAll = useCallback((next: DashboardData, demo = false) => {
     setData(next);
     setIsDemo(demo);
@@ -181,6 +220,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addEntry,
       updateEntry,
       removeEntry,
+      importAds,
       replaceAll,
       loadDemo,
       clearAll,
@@ -195,6 +235,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addEntry,
       updateEntry,
       removeEntry,
+      importAds,
       replaceAll,
       loadDemo,
       clearAll,

@@ -85,6 +85,76 @@ Birinchi ochilganda panel bo'sh turmasligi uchun demo ma'lumot ko'rsatiladi —
 bu haqda yuqorida ogohlantiruvchi qator chiqadi va birinchi o'z yozuvingizni
 kiritganingizda demo belgisi o'chadi.
 
+## Meta Ads integratsiyasi
+
+Reklama bo'limidagi kunlik xarajat, ko'rsatish, klik va lidlarni Meta'dan
+avtomatik tortib olish mumkin — qo'lda kiritish shart emas.
+
+**Token brauzerga hech qachon yuborilmaydi.** Meta'ga murojaat faqat server
+tomonidan (`/api/meta/sync`) qilinadi, token esa server muhit o'zgaruvchisida
+turadi.
+
+### 1. Meta tomonida tayyorgarlik
+
+1. [developers.facebook.com](https://developers.facebook.com) da ilova yarating
+   (turi: **Business**) va uni Business Manager'ingizga bog'lang.
+2. **Business Settings → Users → System Users** bo'limida System User yarating.
+3. Unga reklama hisobingizni **Assign Assets** orqali biriktiring
+   (`View performance` yetarli).
+4. **Generate New Token** → ilovani tanlang → **`ads_read`** ruxsatini belgilang.
+   System User tokeni muddatsiz bo'ladi — dashboard uchun aynan shu kerak.
+5. Reklama hisobi raqamini oling: Ads Manager URL'idagi `act=` qiymati yoki
+   Business Settings → Ad Accounts.
+
+> O'z biznesingizga tegishli hisob uchun App Review talab qilinmaydi.
+
+### 2. O'zgaruvchilarni o'rnatish
+
+Lokalda: `.env.example` faylini `.env.local` deb nusxalang va to'ldiring.
+Vercel'da: **Project → Settings → Environment Variables**.
+
+| O'zgaruvchi | Majburiy | Izoh |
+|---|---|---|
+| `META_ACCESS_TOKEN` | ha | System User tokeni |
+| `META_AD_ACCOUNT_ID` | ha | `act_1234567890` yoki shunchaki raqam |
+| `META_LEAD_ACTIONS` | yo'q | Qaysi action turi lid deb sanaladi. Standart: `lead` |
+| `META_API_VERSION` | yo'q | Graph API versiyasi. Standart: `v23.0` |
+| `META_SYNC_PASSWORD` | yo'q | Sinxronizatsiya endpointini paroll bilan yopadi |
+
+Nomiga `NEXT_PUBLIC_` **qo'shmang** — u qiymatni brauzerga chiqarib yuboradi.
+
+### 3. Ishlatish
+
+Reklama sahifasidagi **"Meta'dan tortish"** tugmasi yuqoridagi davr filtri
+bo'yicha ma'lumot oladi. Kelgan yozuvlar *sana + platforma + kampaniya*
+bo'yicha solishtiriladi: mavjudi yangilanadi, yangisi qo'shiladi — takror
+yig'ilib qolmaydi. Qo'lda kiritilgan Google/TikTok yozuvlariga tegilmaydi.
+
+### Lidlar to'g'ri sanalmasa
+
+Meta lidni kampaniya turiga qarab har xil `action_type` bilan qaytaradi.
+Sinxronizatsiyadan keyin karta ichida **"Meta qaytargan action turlari"**
+ro'yxati ochiladi — u yerda haqiqiy raqamlarni ko'rib, kerakligini
+`META_LEAD_ACTIONS` ga yozing. Ko'p uchraydiganlari:
+
+| Kampaniya turi | action_type |
+|---|---|
+| Lead Ads (Meta formasi) | `lead` |
+| Saytdagi piksel | `offsite_conversion.fb_pixel_lead` |
+| Messenger'ga yozish | `onsite_conversion.messaging_conversation_started_7d` |
+
+Bir nechtasini vergul bilan yozsa ham bo'ladi, lekin ehtiyot bo'ling —
+ba'zi turlar bir xil konversiyani ikki marta sanaydi.
+
+### Xavfsizlik
+
+Meta ulangach, `/api/meta/sync` endpointi reklama raqamlaringizni qaytara
+boshlaydi. Sayt ochiq bo'lsa, URL'ni bilgan odam ularni ko'ra oladi. Shuning
+uchun kamida bittasini qiling:
+
+- **Vercel → Settings → Deployment Protection** ni yoqing (butun saytni yopadi), yoki
+- `META_SYNC_PASSWORD` o'rnating — sinxronizatsiya tugmasi parol so'raydi.
+
 ## Texnologiyalar
 
 - Next.js 16 (App Router) + React 19 + TypeScript
@@ -111,9 +181,11 @@ Kod ichida quyidagilarga qat'iy amal qilingan:
 ```
 src/
   app/                 sahifalar (App Router)
+    api/meta/          Meta Ads server route'lari (token faqat shu yerda)
   components/          UI va grafik komponentlari
   lib/
     types.ts           ma'lumot modellari
+    meta.ts            Meta Marketing API mijozi (server tomonida)
     store.tsx          localStorage'ga bog'langan kontekst
     metrics.ts         sana, guruhlash va KPI hisoblari
     palette.ts         grafik ranglari (yorug'/qorong'i)

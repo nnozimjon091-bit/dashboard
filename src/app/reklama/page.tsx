@@ -2,6 +2,7 @@
 
 import { ChartCard } from "@/components/chart-card";
 import { CategoryBarChart, ColumnChart, TrendChart } from "@/components/charts";
+import { MetaSync } from "@/components/meta-sync";
 import { NoData, NoDataInRange } from "@/components/no-data";
 import { StatTile } from "@/components/stat-tile";
 import { Card, DataTable, PageHeader, SectionTitle } from "@/components/ui";
@@ -89,6 +90,7 @@ export default function AdsPage() {
     return (
       <div className="space-y-5">
         <PageHeader title="Reklama" />
+        <MetaSync />
         <NoData />
       </div>
     );
@@ -100,6 +102,8 @@ export default function AdsPage() {
         title="Reklama"
         description="Kampaniyalar bo'yicha byudjet, trafik va lid narxi."
       />
+
+      <MetaSync />
 
       {isRangeEmpty ? (
         <NoDataInRange />

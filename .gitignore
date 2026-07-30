@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# .env.example maxfiy emas — u sozlash bo'yicha qo'llanma, shuning uchun qoladi
+!.env.example
 
 # vercel
 .vercel
