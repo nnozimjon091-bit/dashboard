@@ -54,6 +54,8 @@ interface StoreValue {
     patch: Partial<Entry<K>>,
   ) => void;
   removeEntry: (key: DatasetKey, id: string) => void;
+  /** Bitta bo'limdagi hamma yozuvni o'chiradi (masalan faqat reklamani). */
+  clearDataset: (key: DatasetKey) => void;
   /**
    * Tashqi manbadan (masalan Google Sheets) reklama yozuvlarini olib kirish:
    * sana + platforma + kampaniya bo'yicha mavjudi topilsa ustiga yoziladi,
@@ -195,6 +197,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  /** Bitta bo'limni butunlay tozalaydi, qolganlariga tegmaydi. */
+  const clearDataset = useCallback((key: DatasetKey) => {
+    setOwnData((current) => ({ ...current, [key]: [] }));
+    setDemoDismissed(true);
+  }, []);
+
   const importAds = useCallback(
     (entries: Omit<AdEntry, "id">[]) => {
       // Hisoblash setOwnData ichida emas, joriy holat ustida bajariladi —
@@ -255,6 +263,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addEntry,
       updateEntry,
       removeEntry,
+      clearDataset,
       importAds,
       replaceAll,
       loadDemo,
@@ -271,6 +280,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addEntry,
       updateEntry,
       removeEntry,
+      clearDataset,
       importAds,
       replaceAll,
       loadDemo,

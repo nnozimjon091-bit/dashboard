@@ -25,13 +25,21 @@ const THEME_OPTIONS: { value: ThemeChoice; label: string }[] = [
 export default function SettingsPage() {
   // Eksport ham, statistika ham faqat sizning yozuvlaringiz ustida ishlaydi —
   // demo ko'rinishi hech qachon faylga tushmaydi.
-  const { ownData: data, isDemo, replaceAll, loadDemo, clearAll } = useStore();
+  const {
+    ownData: data,
+    isDemo,
+    replaceAll,
+    loadDemo,
+    clearAll,
+    clearDataset,
+  } = useStore();
   const { choice, setChoice } = useTheme();
   const fileInput = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<{ tone: "ok" | "error"; text: string } | null>(
     null,
   );
   const [confirmClear, setConfirmClear] = useState(false);
+  const [confirmDataset, setConfirmDataset] = useState<DatasetKey | null>(null);
 
   const dates = allDates(data).sort();
   const total =
@@ -163,6 +171,59 @@ export default function SettingsPage() {
           title="Ma'lumotlarni boshqarish"
           hint="Bu amallarni ortga qaytarib bo'lmaydi"
         />
+
+        {/* Bo'lim bo'yicha tozalash — masalan tashqaridan tortilgan reklama
+            yozuvlarini boshqa bo'limlarga tegmasdan olib tashlash uchun. */}
+        <ul className="mb-4 divide-y divide-line border-y border-line">
+          {DATASETS.map((dataset) => {
+            const count = data[dataset.key].length;
+            const confirming = confirmDataset === dataset.key;
+            return (
+              <li
+                key={dataset.key}
+                className="flex flex-wrap items-center gap-x-3 gap-y-2 py-2"
+              >
+                <span className="text-sm">{dataset.label}</span>
+                <span className="tnum text-xs text-ink-3">
+                  {num(count)} ta yozuv
+                </span>
+                <div className="ml-auto flex gap-1.5">
+                  {confirming ? (
+                    <>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => {
+                          clearDataset(dataset.key);
+                          setConfirmDataset(null);
+                          setMessage({
+                            tone: "ok",
+                            text: `${dataset.label}: ${num(count)} ta yozuv o'chirildi.`,
+                          });
+                        }}
+                      >
+                        Ha, o'chir
+                      </Button>
+                      <Button size="sm" onClick={() => setConfirmDataset(null)}>
+                        Bekor
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      disabled={count === 0}
+                      onClick={() => setConfirmDataset(dataset.key)}
+                    >
+                      O'chirish
+                    </Button>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+
         <div className="flex flex-wrap items-center gap-2">
           {/* Demo — ko'rinish rejimi: o'z yozuvlaringiz bo'lsa, u ularni
               yashirib qo'ymasligi uchun tugma o'chirilgan turadi. */}
