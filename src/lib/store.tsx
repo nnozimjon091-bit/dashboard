@@ -17,7 +17,6 @@ import {
 } from "react";
 import {
   EMPTY_DATA,
-  type AdEntry,
   type DashboardData,
   type DatasetKey,
 } from "./types";
@@ -56,12 +55,6 @@ interface StoreValue {
   removeEntry: (key: DatasetKey, id: string) => void;
   /** Bitta bo'limdagi hamma yozuvni o'chiradi (masalan faqat reklamani). */
   clearDataset: (key: DatasetKey) => void;
-  /**
-   * Tashqi manbadan (masalan Google Sheets) reklama yozuvlarini olib kirish:
-   * sana + platforma + kampaniya bo'yicha mavjudi topilsa ustiga yoziladi,
-   * topilmasa qo'shiladi — takroriy yozuv hosil bo'lmaydi.
-   */
-  importAds: (entries: Omit<AdEntry, "id">[]) => { added: number; updated: number };
   replaceAll: (next: DashboardData) => void;
   /** Demo ko'rinishini qaytaradi (faqat o'z yozuvlaringiz bo'lmaganda mantiqiy). */
   loadDemo: () => void;
@@ -203,38 +196,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setDemoDismissed(true);
   }, []);
 
-  const importAds = useCallback(
-    (entries: Omit<AdEntry, "id">[]) => {
-      // Hisoblash setOwnData ichida emas, joriy holat ustida bajariladi —
-      // StrictMode updater'ni ikki marta chaqirsa ham son ikkilanmaydi.
-      const next = [...ownData.ads];
-      let added = 0;
-      let updated = 0;
-
-      entries.forEach((entry) => {
-        const index = next.findIndex(
-          (row) =>
-            row.date === entry.date &&
-            row.platform === entry.platform &&
-            row.campaign === entry.campaign,
-        );
-        if (index >= 0) {
-          next[index] = { ...next[index], ...entry };
-          updated += 1;
-        } else {
-          next.push({ ...entry, id: newId() });
-          added += 1;
-        }
-      });
-
-      if (added > 0 || updated > 0) {
-        setOwnData((current) => ({ ...current, ads: next }));
-      }
-      return { added, updated };
-    },
-    [ownData.ads],
-  );
-
   const replaceAll = useCallback((next: DashboardData) => {
     setOwnData(stripDemoRows(next));
     setDemoDismissed(true);
@@ -264,7 +225,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       updateEntry,
       removeEntry,
       clearDataset,
-      importAds,
       replaceAll,
       loadDemo,
       clearAll,
@@ -281,7 +241,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       updateEntry,
       removeEntry,
       clearDataset,
-      importAds,
       replaceAll,
       loadDemo,
       clearAll,

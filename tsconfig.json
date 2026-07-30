@@ -6,9 +6,6 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    // Testlar node --experimental-strip-types bilan ishlaydi, u esa import
-    // yo'lida ".ts" kengaytmasini talab qiladi.
-    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
