@@ -28,6 +28,7 @@ const DISMISSED_KEY = "marketing-dashboard:demo-dismissed:v1";
 /** Eski versiya kaliti: "1" = demo yoqilgan, "0" = foydalanuvchi uni yopgan. */
 const LEGACY_DEMO_KEY = "marketing-dashboard:demo:v1";
 const RANGE_KEY = "marketing-dashboard:range:v1";
+const CUSTOM_RANGE_KEY = "marketing-dashboard:custom-range:v1";
 
 /** Demo generatori shu prefiks bilan id beradi. */
 const DEMO_PREFIX = "demo-";
@@ -46,6 +47,9 @@ interface StoreValue {
   rangeKey: RangeKey;
   range: Range;
   setRangeKey: (key: RangeKey) => void;
+  /** "Diapazon" tanlanganda ishlatiladigan qo'lda kiritilgan chegaralar. */
+  customRange: Range;
+  setCustomRange: (next: Partial<Range>) => void;
   addEntry: <K extends DatasetKey>(key: K, entry: Omit<Entry<K>, "id">) => void;
   updateEntry: <K extends DatasetKey>(
     key: K,
@@ -121,6 +125,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [demoDismissed, setDemoDismissed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [rangeKey, setRangeKeyState] = useState<RangeKey>("30");
+  // Bo'sh qiymatlar server va mijoz renderini bir xil qiladi; hydratsiyadan
+  // keyin saqlangani yoki standart (oxirgi 30 kun) qo'yiladi.
+  const [customRange, setCustomRangeState] = useState<Range>({ from: "", to: "" });
 
   // Birinchi render serverdagi natijaga mos bo'lishi shart, shuning uchun
   // localStorage faqat mount'dan keyin o'qiladi. Effekt bir marta ishlaydi —
@@ -132,6 +139,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setDemoDismissed(readDismissed());
     const storedRange = localStorage.getItem(RANGE_KEY) as RangeKey | null;
     if (storedRange) setRangeKeyState(storedRange);
+    const storedCustom = localStorage.getItem(CUSTOM_RANGE_KEY);
+    if (storedCustom) {
+      try {
+        const parsed = JSON.parse(storedCustom) as Partial<Range>;
+        setCustomRangeState({ from: parsed.from ?? "", to: parsed.to ?? "" });
+      } catch {
+        // buzilgan qiymat — e'tiborsiz qoldiramiz
+      }
+    }
     setHydrated(true);
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -150,6 +166,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!hydrated) return;
     localStorage.setItem(RANGE_KEY, rangeKey);
   }, [rangeKey, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    localStorage.setItem(CUSTOM_RANGE_KEY, JSON.stringify(customRange));
+  }, [customRange, hydrated]);
 
   // Demo har seansda qaytadan yasaladi (sanalari bugunga nisbatan) va
   // hech qayerga saqlanmaydi.
@@ -210,7 +231,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const setRangeKey = useCallback((key: RangeKey) => setRangeKeyState(key), []);
 
-  const range = useMemo(() => resolveRange(rangeKey, data), [rangeKey, data]);
+  const setCustomRange = useCallback((next: Partial<Range>) => {
+    setCustomRangeState((current) => ({ ...current, ...next }));
+  }, []);
+
+  const range = useMemo(
+    () => resolveRange(rangeKey, data, customRange),
+    [rangeKey, data, customRange],
+  );
 
   const value = useMemo<StoreValue>(
     () => ({
@@ -221,6 +249,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       rangeKey,
       range,
       setRangeKey,
+      customRange,
+      setCustomRange,
       addEntry,
       updateEntry,
       removeEntry,
@@ -237,6 +267,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       rangeKey,
       range,
       setRangeKey,
+      customRange,
+      setCustomRange,
       addEntry,
       updateEntry,
       removeEntry,

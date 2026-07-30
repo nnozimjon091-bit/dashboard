@@ -15,8 +15,14 @@ import {
   IconVideo,
 } from "@/components/icons";
 import { Button, cx } from "@/components/ui";
-import { longDate } from "@/lib/format";
-import { RANGE_OPTIONS, type RangeKey } from "@/lib/metrics";
+import { longDate, num } from "@/lib/format";
+import {
+  diffDays,
+  RANGE_OPTIONS,
+  todayISO,
+  type Range,
+  type RangeKey,
+} from "@/lib/metrics";
 import { useStore } from "@/lib/store";
 import { useTheme } from "@/lib/theme";
 
@@ -40,7 +46,16 @@ const NAV: NavItem[] = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { hydrated, isDemo, rangeKey, range, setRangeKey, clearAll } = useStore();
+  const {
+    hydrated,
+    isDemo,
+    rangeKey,
+    range,
+    setRangeKey,
+    customRange,
+    setCustomRange,
+    clearAll,
+  } = useStore();
   const current = NAV.find((item) => item.href === pathname);
   const showFilter = current?.scoped ?? false;
 
@@ -73,6 +88,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             ) : null}
             <ThemeToggle />
           </div>
+          {showFilter && rangeKey === "diapazon" ? (
+            <CustomRangeRow value={customRange} onChange={setCustomRange} />
+          ) : null}
           <MobileNav pathname={pathname} />
         </header>
 
@@ -190,6 +208,58 @@ function RangeFilter({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/** "Diapazon" tanlanganda chiqadigan qatorda boshlanish va tugash sanasi. */
+function CustomRangeRow({
+  value,
+  onChange,
+}: {
+  value: Range;
+  onChange: (next: Partial<Range>) => void;
+}) {
+  const today = todayISO();
+  const field =
+    "min-h-9 rounded-lg border border-line bg-surface px-2.5 text-sm text-ink tnum " +
+    "focus:outline-2 focus:outline-offset-0 focus:outline-accent";
+
+  return (
+    <div className="mx-auto flex max-w-[1400px] flex-wrap items-end gap-3 px-4 pb-3 sm:px-6">
+      <label className="block">
+        <span className="mb-1 block text-xs font-medium text-ink-2">
+          Boshlanishi
+        </span>
+        <input
+          type="date"
+          max={today}
+          value={value.from}
+          onChange={(event) => onChange({ from: event.target.value })}
+          className={field}
+        />
+      </label>
+      <label className="block">
+        <span className="mb-1 block text-xs font-medium text-ink-2">
+          Tugashi
+        </span>
+        <input
+          type="date"
+          max={today}
+          value={value.to}
+          onChange={(event) => onChange({ to: event.target.value })}
+          className={field}
+        />
+      </label>
+      {value.from && value.to ? (
+        <p className="pb-2 text-xs text-ink-3">
+          {num(Math.abs(diffDays(value.from, value.to)) + 1)} kun
+        </p>
+      ) : (
+        <p className="pb-2 text-xs text-ink-3">
+          Ikkala sanani tanlang — bo'sh qolsa oxirgi 30 kun olinadi
+        </p>
+      )}
     </div>
   );
 }

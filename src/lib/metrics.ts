@@ -42,7 +42,7 @@ export function diffDays(from: string, to: string): number {
 
 // ── Davr (range) ──────────────────────────────────────────────────────
 
-export type RangeKey = "7" | "30" | "90" | "oy" | "hammasi";
+export type RangeKey = "7" | "30" | "90" | "oy" | "hammasi" | "diapazon";
 
 export interface Range {
   from: string;
@@ -55,6 +55,7 @@ export const RANGE_OPTIONS: { value: RangeKey; label: string }[] = [
   { value: "90", label: "90 kun" },
   { value: "oy", label: "Shu oy" },
   { value: "hammasi", label: "Hammasi" },
+  { value: "diapazon", label: "Diapazon" },
 ];
 
 export function allDates(data: DashboardData): string[] {
@@ -66,8 +67,18 @@ export function allDates(data: DashboardData): string[] {
   ];
 }
 
-export function resolveRange(key: RangeKey, data: DashboardData): Range {
+export function resolveRange(
+  key: RangeKey,
+  data: DashboardData,
+  custom?: Partial<Range>,
+): Range {
   const today = todayISO();
+  if (key === "diapazon") {
+    const from = custom?.from || addDays(today, -29);
+    const to = custom?.to || today;
+    // Sanalar teskari kiritilsa, o'rnini almashtiramiz.
+    return from <= to ? { from, to } : { from: to, to: from };
+  }
   if (key === "oy") return { from: today.slice(0, 7) + "-01", to: today };
   if (key === "hammasi") {
     const dates = allDates(data).sort();
