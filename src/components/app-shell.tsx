@@ -55,6 +55,7 @@ const NAV: NavItem[] = [
     children: [
       { href: "/reklama", label: "Umumiy", short: "Reklama" },
       { href: "/reklama/meta", label: "Meta Ads" },
+      { href: "/reklama/google", label: "Google Ads" },
     ],
   },
   { href: "/video", label: "Video", Icon: IconVideo, scoped: true },
