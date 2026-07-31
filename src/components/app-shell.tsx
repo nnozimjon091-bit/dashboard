@@ -26,23 +26,57 @@ import {
 import { useStore } from "@/lib/store";
 import { useTheme } from "@/lib/theme";
 
-interface NavItem {
+type IconFn = (props: { className?: string }) => React.JSX.Element;
+
+interface NavChild {
   href: string;
   label: string;
-  Icon: (props: { className?: string }) => React.JSX.Element;
+  /** Mobil menyudagi qisqa nom (u yerda guruh sarlavhasi ko'rinmaydi). */
+  short?: string;
+}
+
+interface NavItem {
+  href?: string;
+  label: string;
+  Icon: IconFn;
   /** Sarlavhadagi davr filtri shu sahifadagi grafiklarga taalluqlimi. */
   scoped: boolean;
+  /** Ichma-ich menyu: guruhning o'zi havola emas, faqat bolalari. */
+  children?: NavChild[];
 }
 
 const NAV: NavItem[] = [
   { href: "/", label: "Umumiy ko'rinish", Icon: IconOverview, scoped: true },
   { href: "/ijtimoiy", label: "Ijtimoiy tarmoq", Icon: IconSocial, scoped: true },
-  { href: "/reklama", label: "Reklama", Icon: IconAds, scoped: true },
+  {
+    label: "Reklama",
+    Icon: IconAds,
+    scoped: true,
+    children: [
+      { href: "/reklama", label: "Umumiy", short: "Reklama" },
+      { href: "/reklama/meta", label: "Meta Ads" },
+    ],
+  },
   { href: "/video", label: "Video", Icon: IconVideo, scoped: true },
   { href: "/sotuv", label: "Sotuv va lidlar", Icon: IconSales, scoped: true },
   { href: "/kiritish", label: "Ma'lumot kiritish", Icon: IconEntry, scoped: false },
   { href: "/sozlamalar", label: "Sozlamalar", Icon: IconSettings, scoped: false },
 ];
+
+/** Joriy sahifani guruh ichidan ham topadi. */
+function findCurrent(pathname: string): { label: string; scoped: boolean } | null {
+  for (const item of NAV) {
+    if (item.children) {
+      const child = item.children.find((entry) => entry.href === pathname);
+      if (child) {
+        return { label: `${item.label} — ${child.label}`, scoped: item.scoped };
+      }
+    } else if (item.href === pathname) {
+      return { label: item.label, scoped: item.scoped };
+    }
+  }
+  return null;
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -56,7 +90,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     setCustomRange,
     clearAll,
   } = useStore();
-  const current = NAV.find((item) => item.href === pathname);
+  const current = findCurrent(pathname);
   const showFilter = current?.scoped ?? false;
 
   return (
@@ -119,12 +153,46 @@ function Sidebar({ pathname }: { pathname: string }) {
         </span>
       </div>
       <nav className="flex-1 space-y-0.5 px-3 pb-4" aria-label="Asosiy menyu">
-        {NAV.map(({ href, label, Icon }) => {
+        {NAV.map((item) => {
+          const { href, label, Icon, children } = item;
+
+          // Guruh: sarlavhaning o'zi havola emas, ostida ichki havolalar turadi.
+          if (children) {
+            return (
+              <div key={label}>
+                <p className="flex items-center gap-2.5 px-3 pb-1 pt-2 text-sm text-ink-3">
+                  <Icon />
+                  {label}
+                </p>
+                <div className="space-y-0.5 pl-[30px]">
+                  {children.map((child) => {
+                    const active = pathname === child.href;
+                    return (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        aria-current={active ? "page" : undefined}
+                        className={cx(
+                          "block rounded-lg px-3 py-1.5 text-sm transition",
+                          active
+                            ? "bg-accent-soft font-medium text-ink"
+                            : "text-ink-2 hover:bg-surface-2 hover:text-ink",
+                        )}
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          }
+
           const active = pathname === href;
           return (
             <Link
               key={href}
-              href={href}
+              href={href ?? "/"}
               aria-current={active ? "page" : undefined}
               className={cx(
                 "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition",
@@ -152,7 +220,16 @@ function MobileNav({ pathname }: { pathname: string }) {
       className="flex gap-1 overflow-x-auto border-t border-line px-3 py-2 lg:hidden"
       aria-label="Asosiy menyu"
     >
-      {NAV.map(({ href, label, Icon }) => {
+      {/* Mobil menyuda ichma-ich joy yo'q — guruh bolalari yonma-yon chiqadi. */}
+      {NAV.flatMap((item) =>
+        item.children
+          ? item.children.map((child) => ({
+              href: child.href,
+              label: child.short ?? child.label,
+              Icon: item.Icon,
+            }))
+          : [{ href: item.href ?? "/", label: item.label, Icon: item.Icon }],
+      ).map(({ href, label, Icon }) => {
         const active = pathname === href;
         return (
           <Link
