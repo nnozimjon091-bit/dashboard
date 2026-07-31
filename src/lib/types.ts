@@ -52,11 +52,31 @@ export interface SalesEntry {
   revenue: number; // USD
 }
 
+/** Asosiy raqamga kelgan qo'ng'iroqlar — kanal kesimida, kunlik jami. */
+export interface InboundEntry {
+  id: string;
+  date: string;
+  source: SalesSource;
+  calls: number; // jami kelgan qo'ng'iroqlar
+  answered: number; // shundan javob berilgani
+  deals: number; // qo'ng'iroqlardan chiqqan sotuvlar
+}
+
+/** Operatorlar qilgan chiquvchi qo'ng'iroqlar natijasi — kunlik jami. */
+export interface OutboundEntry {
+  id: string;
+  date: string;
+  leads: number;
+  deals: number;
+}
+
 export interface DashboardData {
   social: SocialEntry[];
   ads: AdEntry[];
   video: VideoEntry[];
   sales: SalesEntry[];
+  inbound: InboundEntry[];
+  outbound: OutboundEntry[];
 }
 
 export type DatasetKey = keyof DashboardData;
@@ -66,6 +86,8 @@ export const EMPTY_DATA: DashboardData = {
   ads: [],
   video: [],
   sales: [],
+  inbound: [],
+  outbound: [],
 };
 
 // ── Ko'rinadigan nomlar ────────────────────────────────────────────────

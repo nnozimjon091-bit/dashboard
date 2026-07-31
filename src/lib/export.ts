@@ -69,12 +69,12 @@ export function parseImported(text: string): ImportResult {
     return { ok: false, error: "Fayl ichida ma'lumot topilmadi." };
   }
   const source = parsed as Partial<Record<DatasetKey, unknown>>;
-  const keys: DatasetKey[] = ["social", "ads", "video", "sales"];
+  const keys: DatasetKey[] = ["social", "ads", "video", "sales", "inbound", "outbound"];
   const known = keys.filter((key) => Array.isArray(source[key]));
   if (known.length === 0) {
     return {
       ok: false,
-      error: "Faylda social / ads / video / sales bo'limlari yo'q.",
+      error: "Faylda kutilgan bo'limlar (social / ads / video / sales …) topilmadi.",
     };
   }
   return {
@@ -84,6 +84,8 @@ export function parseImported(text: string): ImportResult {
       ads: Array.isArray(source.ads) ? source.ads : [],
       video: Array.isArray(source.video) ? source.video : [],
       sales: Array.isArray(source.sales) ? source.sales : [],
+      inbound: Array.isArray(source.inbound) ? source.inbound : [],
+      outbound: Array.isArray(source.outbound) ? source.outbound : [],
     } as DashboardData,
   };
 }

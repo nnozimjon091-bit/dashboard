@@ -30,7 +30,12 @@ export interface DashboardView {
 }
 
 const countRows = (data: DashboardData): number =>
-  data.social.length + data.ads.length + data.video.length + data.sales.length;
+  data.social.length +
+  data.ads.length +
+  data.video.length +
+  data.sales.length +
+  data.inbound.length +
+  data.outbound.length;
 
 export function useDashboard(): DashboardView {
   const { data, range } = useStore();

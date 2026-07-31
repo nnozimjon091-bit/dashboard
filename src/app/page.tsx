@@ -4,7 +4,7 @@ import { ChartCard } from "@/components/chart-card";
 import { CategoryBarChart, ColumnChart, TrendChart } from "@/components/charts";
 import { NoData, NoDataInRange } from "@/components/no-data";
 import { HeroStat, StatTile } from "@/components/stat-tile";
-import { PageHeader } from "@/components/ui";
+import { PageHeader, SectionTitle } from "@/components/ui";
 import { compact, num, pct, ratio, usd, usdCompact, usdFine } from "@/lib/format";
 import {
   buildSeries,
@@ -69,6 +69,22 @@ export default function OverviewPage() {
     value: sum(
       current.sales.filter((row) => row.source === source.value),
       (row) => row.leads,
+    ),
+  }))
+    .filter((row) => row.value > 0)
+    .sort((a, b) => b.value - a.value);
+
+  // O'tkazib yuborilgan qo'ng'iroq qo'lda kiritilmaydi — farqdan chiqadi.
+  const callsSeries = buildSeries(current.inbound, range, bucket, {
+    answered: (row) => row.answered,
+    missed: (row) => Math.max(0, row.calls - row.answered),
+  });
+
+  const callsBySource = SALES_SOURCES.map((source) => ({
+    label: source.label,
+    value: sum(
+      current.inbound.filter((row) => row.source === source.value),
+      (row) => row.calls,
     ),
   }))
     .filter((row) => row.value > 0)
@@ -339,6 +355,122 @@ export default function OverviewPage() {
               />
             </ChartCard>
           </div>
+
+          <section>
+            <SectionTitle
+              title="Operatorlar"
+              hint="Asosiy raqamga kelgan va operatorlar qilgan qo'ng'iroqlar"
+            />
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <StatTile
+                label="Kiruvchi qo'ng'iroqlar"
+                value={num(kpi.inbound.calls)}
+                delta={delta(kpi.inbound.calls, prev.inbound.calls)}
+              />
+              <StatTile
+                label="Javob berish darajasi"
+                value={pct(kpi.inbound.answerRate)}
+                delta={delta(kpi.inbound.answerRate, prev.inbound.answerRate)}
+                hint={`${num(kpi.inbound.answered)} ta javob berilgan`}
+              />
+              <StatTile
+                label="O'tkazib yuborilgan"
+                value={num(kpi.inbound.missed)}
+                delta={delta(kpi.inbound.missed, prev.inbound.missed)}
+                goodWhen="down"
+              />
+              <StatTile
+                label="Kiruvchidan sotuv"
+                value={num(kpi.inbound.deals)}
+                delta={delta(kpi.inbound.deals, prev.inbound.deals)}
+                hint={`javob berilganning ${pct(kpi.inbound.dealRate)}`}
+              />
+              <StatTile
+                label="Chiquvchi lidlar"
+                value={num(kpi.outbound.leads)}
+                delta={delta(kpi.outbound.leads, prev.outbound.leads)}
+              />
+              <StatTile
+                label="Chiquvchi bitimlar"
+                value={num(kpi.outbound.deals)}
+                delta={delta(kpi.outbound.deals, prev.outbound.deals)}
+                hint={`konversiya ${pct(kpi.outbound.conversion)}`}
+              />
+            </div>
+
+            <div className="mt-4 grid gap-4 xl:grid-cols-2">
+              <ChartCard<SeriesPoint>
+                title="Kiruvchi qo'ng'iroqlar"
+                subtitle="javob berilgan va o'tkazib yuborilgan"
+                legend={[
+                  { name: "Javob berilgan", color: color("calls", "answered") },
+                  {
+                    name: "O'tkazib yuborilgan",
+                    color: color("calls", "missed"),
+                  },
+                ]}
+                table={{
+                  rows: callsSeries,
+                  rowKey: (row) => String(row.key),
+                  columns: [
+                    { key: "label", label: "Davr", render: (row) => row.label },
+                    {
+                      key: "answered",
+                      label: "Javob berilgan",
+                      align: "right",
+                      render: (row) => num(Number(row.answered)),
+                    },
+                    {
+                      key: "missed",
+                      label: "O'tkazib yuborilgan",
+                      align: "right",
+                      render: (row) => num(Number(row.missed)),
+                    },
+                  ],
+                }}
+              >
+                <ColumnChart
+                  data={callsSeries}
+                  format={(value) => num(value)}
+                  series={[
+                    {
+                      key: "answered",
+                      name: "Javob berilgan",
+                      color: color("calls", "answered"),
+                    },
+                    {
+                      key: "missed",
+                      name: "O'tkazib yuborilgan",
+                      color: color("calls", "missed"),
+                    },
+                  ]}
+                />
+              </ChartCard>
+
+              <ChartCard<{ label: string; value: number }>
+                title="Kanallar bo'yicha qo'ng'iroqlar"
+                subtitle="tanlangan davrdagi jami"
+                table={{
+                  rows: callsBySource,
+                  rowKey: (row) => row.label,
+                  columns: [
+                    { key: "label", label: "Kanal", render: (row) => row.label },
+                    {
+                      key: "value",
+                      label: "Qo'ng'iroq",
+                      align: "right",
+                      render: (row) => num(row.value),
+                    },
+                  ],
+                }}
+              >
+                <CategoryBarChart
+                  data={callsBySource}
+                  format={(value) => num(value)}
+                />
+              </ChartCard>
+            </div>
+          </section>
         </>
       )}
     </div>

@@ -7,7 +7,8 @@ import {
   type DatasetConfig,
 } from "@/components/entry-panel";
 import { Card, cx, PageHeader } from "@/components/ui";
-import { num, shortDate, usd } from "@/lib/format";
+import { num, pct, shortDate, usd } from "@/lib/format";
+import { safeDiv } from "@/lib/metrics";
 import {
   ADS_PLATFORMS,
   labelFor,
@@ -358,11 +359,144 @@ const SALES_CONFIG: DatasetConfig<"sales"> = {
   ],
 };
 
+const INBOUND_CONFIG: DatasetConfig<"inbound"> = {
+  dataset: "inbound",
+  title: "Kiruvchi qo'ng'iroqlar",
+  hint: "Asosiy raqamga kelgan qo'ng'iroqlar, kanal kesimida.",
+  fields: [
+    { name: "date", label: "Sana", type: "date" },
+    { name: "source", label: "Kanal", type: "select", options: SALES_SOURCES },
+    {
+      name: "calls",
+      label: "Qo'ng'iroqlar",
+      type: "number",
+      hint: "Shu kanaldan kelgan jami qo'ng'iroqlar",
+    },
+    {
+      name: "answered",
+      label: "Javob berilgan",
+      type: "number",
+      hint: "Ko'tarilgani. Qolgani o'tkazib yuborilgan deb hisoblanadi",
+    },
+    {
+      name: "deals",
+      label: "Sotuvlar",
+      type: "number",
+      hint: "Shu qo'ng'iroqlardan chiqqan bitimlar",
+    },
+  ],
+  defaults: { source: "instagram", calls: "", answered: "", deals: "" },
+  toEntry: (values) => ({
+    date: values.date,
+    source: values.source as SalesSource,
+    calls: toNumber(values.calls),
+    answered: toNumber(values.answered),
+    deals: toNumber(values.deals),
+  }),
+  toValues: (row) => ({
+    date: row.date,
+    source: row.source,
+    calls: String(row.calls),
+    answered: String(row.answered),
+    deals: String(row.deals),
+  }),
+  isSame: (row, values) =>
+    row.date === values.date && row.source === values.source,
+  columns: [
+    { key: "date", label: "Sana", render: (row) => shortDate(row.date) },
+    {
+      key: "source",
+      label: "Kanal",
+      render: (row) => labelFor(SALES_SOURCES, row.source),
+    },
+    {
+      key: "calls",
+      label: "Qo'ng'iroq",
+      align: "right",
+      render: (row) => num(row.calls),
+    },
+    {
+      key: "answered",
+      label: "Javob",
+      align: "right",
+      render: (row) => num(row.answered),
+    },
+    {
+      key: "rate",
+      label: "Javob %",
+      align: "right",
+      render: (row) => pct(safeDiv(row.answered, row.calls)),
+    },
+    {
+      key: "deals",
+      label: "Sotuv",
+      align: "right",
+      render: (row) => num(row.deals),
+    },
+  ],
+};
+
+const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
+  dataset: "outbound",
+  title: "Chiquvchi qo'ng'iroqlar",
+  hint: "Operatorlar qilgan qo'ng'iroqlar natijasi, kunlik jami.",
+  fields: [
+    { name: "date", label: "Sana", type: "date" },
+    {
+      name: "leads",
+      label: "Lidlar",
+      type: "number",
+      hint: "Qiziqish bildirganlar",
+    },
+    {
+      name: "deals",
+      label: "Bitimlar",
+      type: "number",
+      hint: "Yopilgan sotuvlar",
+    },
+  ],
+  defaults: { leads: "", deals: "" },
+  toEntry: (values) => ({
+    date: values.date,
+    leads: toNumber(values.leads),
+    deals: toNumber(values.deals),
+  }),
+  toValues: (row) => ({
+    date: row.date,
+    leads: String(row.leads),
+    deals: String(row.deals),
+  }),
+  isSame: (row, values) => row.date === values.date,
+  columns: [
+    { key: "date", label: "Sana", render: (row) => shortDate(row.date) },
+    {
+      key: "leads",
+      label: "Lid",
+      align: "right",
+      render: (row) => num(row.leads),
+    },
+    {
+      key: "deals",
+      label: "Bitim",
+      align: "right",
+      render: (row) => num(row.deals),
+    },
+    {
+      key: "conversion",
+      label: "Konversiya",
+      align: "right",
+      render: (row) => pct(safeDiv(row.deals, row.leads)),
+    },
+  ],
+};
+
 const TABS = [
   { id: "social", label: "Ijtimoiy tarmoq" },
   { id: "ads", label: "Reklama" },
   { id: "video", label: "Video" },
   { id: "sales", label: "Sotuv" },
+  { id: "inbound", label: "Kiruvchi operator" },
+  { id: "outbound", label: "Chiquvchi operator" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -407,6 +541,8 @@ export default function EntryPage() {
       {tab === "ads" ? <EntryPanel config={ADS_CONFIG} /> : null}
       {tab === "video" ? <EntryPanel config={VIDEO_CONFIG} /> : null}
       {tab === "sales" ? <EntryPanel config={SALES_CONFIG} /> : null}
+      {tab === "inbound" ? <EntryPanel config={INBOUND_CONFIG} /> : null}
+      {tab === "outbound" ? <EntryPanel config={OUTBOUND_CONFIG} /> : null}
     </div>
   );
 }

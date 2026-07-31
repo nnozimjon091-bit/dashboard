@@ -24,7 +24,7 @@ npm run start
 
 | Sahifa | Nima ko'rsatadi |
 |---|---|
-| **Umumiy ko'rinish** | Daromad, xarajat, ROAS, CAC, lidlar, konversiya, auditoriya o'sishi |
+| **Umumiy ko'rinish** | Daromad, xarajat, ROAS, CAC, lidlar, konversiya, auditoriya o'sishi, tagida operatorlar bo'limi |
 | **Ijtimoiy tarmoq** | Instagram va Telegram: obunachilar, qamrov, faollik (ER) |
 | **Reklama** | Kampaniyalar kesimida byudjet, CTR, CPC, CPM, CPL |
 | **Video** | YouTube va TikTok: ko'rishlar, obunachilar, ko'rish soatlari |
@@ -47,6 +47,8 @@ marta kiritsangiz, yangi yozuv qo'shilmaydi — eskisi yangilanadi.
 | Reklama | sana, platforma, kampaniya, xarajat, ko'rsatishlar, kliklar, lidlar |
 | Video | sana, platforma, ko'rishlar, obunachilar (kun oxiriga), ko'rish soatlari, likelar |
 | Sotuv | sana, kanal, lidlar, bitimlar, daromad |
+| Kiruvchi operator | sana, kanal, qo'ng'iroqlar, javob berilgan, sotuvlar |
+| Chiquvchi operator | sana, lidlar, bitimlar |
 
 **Muhim:** _Reklama_ bo'limidagi lid — faqat pullik reklamadan kelgan murojaat
 (CPL shundan hisoblanadi). _Sotuv_ bo'limidagi lid — sotuv voronkasiga tushgan
@@ -68,7 +70,18 @@ O'rt. chek = daromad / bitimlar
 ROAS       = daromad / reklama xarajati
 CAC        = reklama xarajati / bitimlar
 Sof foyda  = daromad − reklama xarajati
+
+Javob berish darajasi = javob berilgan / qo'ng'iroqlar
+O'tkazib yuborilgan   = qo'ng'iroqlar − javob berilgan
+Kiruvchidan sotuv %   = sotuvlar / javob berilgan
+Chiquvchi konversiya  = bitimlar / lidlar
 ```
+
+**Operatorlar bo'limi.** _Kiruvchi_ — asosiy raqamga kelgan qo'ng'iroqlar, kanal
+kesimida. O'tkazib yuborilgan qo'ng'iroq alohida kiritilmaydi, jami va javob
+berilgan orasidagi farqdan chiqadi. _Chiquvchi_ — operatorlar qilgan
+qo'ng'iroqlarning natijasi, kunlik jami. Ikkalasi Umumiy ko'rinish sahifasining
+oxirida alohida bo'lim bo'lib chiqadi.
 
 ## Ma'lumot xavfsizligi
 

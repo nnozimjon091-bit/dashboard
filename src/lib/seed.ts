@@ -5,6 +5,8 @@ import { addDays, todayISO } from "./metrics";
 import type {
   AdEntry,
   DashboardData,
+  InboundEntry,
+  OutboundEntry,
   SalesEntry,
   SocialEntry,
   VideoEntry,
@@ -43,6 +45,8 @@ export function buildDemoData(days = 90): DashboardData {
   const ads: AdEntry[] = [];
   const video: VideoEntry[] = [];
   const sales: SalesEntry[] = [];
+  const inbound: InboundEntry[] = [];
+  const outbound: OutboundEntry[] = [];
 
   let igFollowers = 8_240;
   let tgFollowers = 3_115;
@@ -148,8 +152,34 @@ export function buildDemoData(days = 90): DashboardData {
         deals,
         revenue: Number((deals * check * jitter(0.25)).toFixed(2)),
       });
+
+      // ── Kiruvchi qo'ng'iroqlar ──
+      // Har bir lid ortida bir nechta qo'ng'iroq bo'ladi.
+      const calls = Math.max(0, Math.round(leads * 1.8 * jitter(0.4)));
+      if (calls === 0) return;
+      const answered = Math.min(
+        calls,
+        Math.round(calls * (0.86 * jitter(0.15))),
+      );
+      inbound.push({
+        id: `demo-in-${order}-${date}`,
+        date,
+        source,
+        calls,
+        answered,
+        deals: Math.max(0, Math.round(answered * 0.16 * jitter(0.7))),
+      });
+    });
+
+    // ── Chiquvchi qo'ng'iroqlar ──
+    const outLeads = Math.max(0, Math.round(18 * weekend * jitter(0.6)));
+    outbound.push({
+      id: `demo-out-${date}`,
+      date,
+      leads: outLeads,
+      deals: Math.max(0, Math.round(outLeads * 0.19 * jitter(0.8))),
     });
   }
 
-  return { social, ads, video, sales };
+  return { social, ads, video, sales, inbound, outbound };
 }

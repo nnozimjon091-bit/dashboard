@@ -14,6 +14,8 @@ const DATASETS: { key: DatasetKey; label: string }[] = [
   { key: "ads", label: "Reklama" },
   { key: "video", label: "Video" },
   { key: "sales", label: "Sotuv" },
+  { key: "inbound", label: "Kiruvchi operator" },
+  { key: "outbound", label: "Chiquvchi operator" },
 ];
 
 const THEME_OPTIONS: { value: ThemeChoice; label: string }[] = [

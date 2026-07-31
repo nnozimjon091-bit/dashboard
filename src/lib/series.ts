@@ -5,6 +5,8 @@ export const SERIES_ORDER = {
   /** Daromad — 1-slot (ko'k), xarajat — 2-slot (to'q sariq) */
   money: ["revenue", "spend"],
   funnel: ["leads", "deals"],
+  /** Javob berilgan — 1-slot, o'tkazib yuborilgan — 2-slot */
+  calls: ["answered", "missed"],
   /**
    * Kanal ranglari butun dashboard bo'ylab bitta ro'yxatdan olinadi —
    * Instagram qaysi grafikda bo'lmasin, doim bir xil rangda.

@@ -3,6 +3,8 @@
 import type {
   AdEntry,
   DashboardData,
+  InboundEntry,
+  OutboundEntry,
   SalesEntry,
   SocialEntry,
   VideoEntry,
@@ -64,6 +66,8 @@ export function allDates(data: DashboardData): string[] {
     ...data.ads.map((r) => r.date),
     ...data.video.map((r) => r.date),
     ...data.sales.map((r) => r.date),
+    ...data.inbound.map((r) => r.date),
+    ...data.outbound.map((r) => r.date),
   ];
 }
 
@@ -109,6 +113,8 @@ export function sliceData(data: DashboardData, range: Range): DashboardData {
     ads: filterRange(data.ads, range),
     video: filterRange(data.video, range),
     sales: filterRange(data.sales, range),
+    inbound: filterRange(data.inbound, range),
+    outbound: filterRange(data.outbound, range),
   };
 }
 
@@ -383,11 +389,49 @@ export function salesKpis(rows: SalesEntry[]): SalesKpis {
   };
 }
 
+export interface InboundKpis {
+  calls: number;
+  answered: number;
+  missed: number;
+  deals: number;
+  answerRate: number;
+  dealRate: number;
+}
+
+export function inboundKpis(rows: InboundEntry[]): InboundKpis {
+  const calls = sum(rows, (r) => r.calls);
+  const answered = sum(rows, (r) => r.answered);
+  const deals = sum(rows, (r) => r.deals);
+  return {
+    calls,
+    answered,
+    // Javob berilmagani qo'lda kiritilmaydi — farqdan chiqadi.
+    missed: Math.max(0, calls - answered),
+    deals,
+    answerRate: safeDiv(answered, calls),
+    dealRate: safeDiv(deals, answered),
+  };
+}
+
+export interface OutboundKpis {
+  leads: number;
+  deals: number;
+  conversion: number;
+}
+
+export function outboundKpis(rows: OutboundEntry[]): OutboundKpis {
+  const leads = sum(rows, (r) => r.leads);
+  const deals = sum(rows, (r) => r.deals);
+  return { leads, deals, conversion: safeDiv(deals, leads) };
+}
+
 export interface OverviewKpis {
   ads: AdsKpis;
   social: SocialKpis;
   video: VideoKpis;
   sales: SalesKpis;
+  inbound: InboundKpis;
+  outbound: OutboundKpis;
   roas: number;
   cac: number;
   profit: number;
@@ -401,6 +445,8 @@ export function overviewKpis(data: DashboardData): OverviewKpis {
     social: socialKpis(data.social),
     video: videoKpis(data.video),
     sales,
+    inbound: inboundKpis(data.inbound),
+    outbound: outboundKpis(data.outbound),
     roas: safeDiv(sales.revenue, ads.spend),
     cac: safeDiv(ads.spend, sales.deals),
     profit: sales.revenue - ads.spend,

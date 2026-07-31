@@ -76,7 +76,12 @@ function newId(): string {
 
 export function countRows(data: DashboardData): number {
   return (
-    data.social.length + data.ads.length + data.video.length + data.sales.length
+    data.social.length +
+    data.ads.length +
+    data.video.length +
+    data.sales.length +
+    data.inbound.length +
+    data.outbound.length
   );
 }
 
@@ -93,6 +98,8 @@ function stripDemoRows(data: DashboardData): DashboardData {
     ads: clean(data.ads),
     video: clean(data.video),
     sales: clean(data.sales),
+    inbound: clean(data.inbound),
+    outbound: clean(data.outbound),
   };
 }
 
@@ -107,6 +114,8 @@ function readStored(): DashboardData | null {
       ads: Array.isArray(parsed.ads) ? parsed.ads : [],
       video: Array.isArray(parsed.video) ? parsed.video : [],
       sales: Array.isArray(parsed.sales) ? parsed.sales : [],
+      inbound: Array.isArray(parsed.inbound) ? parsed.inbound : [],
+      outbound: Array.isArray(parsed.outbound) ? parsed.outbound : [],
     });
   } catch {
     return null;
