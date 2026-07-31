@@ -26,7 +26,7 @@ npm run start
 |---|---|
 | **Umumiy ko'rinish** | Daromad, xarajat, ROAS, CAC, lidlar, konversiya, auditoriya o'sishi, tagida operatorlar bo'limi |
 | **Ijtimoiy tarmoq** | Instagram va Telegram: obunachilar, qamrov, faollik (ER) |
-| **Reklama** | Kampaniyalar kesimida byudjet, CTR, CPC, CPM, CPL |
+| **Reklama** | Uch bo'lim: Umumiy, Meta Ads, Google Ads — byudjet, CTR, CPC, CPM, CPL |
 | **Video** | YouTube va TikTok: ko'rishlar, obunachilar, ko'rish soatlari |
 | **Sotuv va lidlar** | Lid → bitim yo'li, kanallarning daromadga hissasi |
 | **Ma'lumot kiritish** | Kunlik ko'rsatkichlarni qo'shish va tahrirlash |
@@ -83,6 +83,47 @@ berilgan orasidagi farqdan chiqadi. _Chiquvchi_ — operatorlar qilgan
 qo'ng'iroqlarning natijasi, kunlik jami. Ikkalasi Umumiy ko'rinish sahifasining
 oxirida alohida bo'lim bo'lib chiqadi.
 
+## Google Ads hisobotini yuklash
+
+Google Ads sahifasidagi **"Hisobot yuklash"** tugmasi orqali kampaniya
+hisobotini to'g'ridan-to'g'ri yopishtirish mumkin — qo'lda kiritish shart emas.
+Hammasi brauzerda o'qiladi, serverga hech narsa yuborilmaydi.
+
+Google Ads → Kampaniyalar → jadvalni sarlavhasi va tepasidagi sana qatori
+bilan birga nusxalang:
+
+```
+Отчет о кампании
+30 июля 2026 г. - 30 июля 2026 г.
+Статус кампании  Кампания   ...  Показы  Взаимодействия  ...  Расходы
+Включено         Уролог1    ...  212     34              ...  8,94
+Итого (Кампании) --         ...  1462    244             ...  81,69   ← tashlanadi
+```
+
+| Hisobotdagi ustun | Dashboardda |
+|---|---|
+| `Кампания` | kampaniya nomi |
+| `Показы` | ko'rsatishlar |
+| `Взаимодействия` (yoki `Клики`) | kliklar |
+| `Расходы` | xarajat |
+| `Конверсии` (bo'lsa) | lidlar |
+| `День` (bo'lsa) | har qatorning o'z sanasi |
+
+Parser ustunlarni **nomi bo'yicha** topadi — tartibi yoki soni o'zgarsa ham
+ishlaydi. Rus formatidagi sonlar (`10,5`, `1 462`) va sanalar
+(`30 июля 2026 г.`) tushuniladi. `Итого (...)` qatorlari tashlanadi, aks holda
+xarajat ikki barobar chiqib ketardi. Ingliz tilidagi hisobot ham qabul
+qilinadi.
+
+Yozuvlar *sana + platforma + kampaniya* bo'yicha solishtiriladi: bitta
+hisobotni ikki marta yuklasangiz takror yig'ilmaydi, mavjudi yangilanadi.
+
+**Ikki narsaga e'tibor bering.** Hisobotda `Конверсии` ustuni bo'lmasa lidlar
+nol bo'lib qoladi va CPL hisoblanmaydi — kerak bo'lsa uni Google Ads'da
+ustunlar ro'yxatiga qo'shing. Va agar hisobot bir necha kunlik **jami** bo'lsa,
+uni kunlarga bo'lib bo'lmaydi: hammasi oxirgi kunga yoziladi va ogohlantirish
+chiqadi. Kunlik kesim uchun hisobotga `День` ustunini qo'shing.
+
 ## Ma'lumot xavfsizligi
 
 Hamma narsa brauzerda turadi, shuning uchun:
@@ -127,6 +168,7 @@ src/
   components/          UI va grafik komponentlari
   lib/
     types.ts           ma'lumot modellari
+    google-ads.ts      Google Ads hisobotini o'qiydigan parser
     store.tsx          localStorage'ga bog'langan kontekst
     metrics.ts         sana, guruhlash va KPI hisoblari
     palette.ts         grafik ranglari (yorug'/qorong'i)

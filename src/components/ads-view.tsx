@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import { ChartCard } from "@/components/chart-card";
 import { CategoryBarChart, ColumnChart, TrendChart } from "@/components/charts";
 import { NoData, NoDataInRange } from "@/components/no-data";
@@ -61,10 +63,13 @@ export function AdsView({
   platform,
   title,
   description,
+  toolbar,
 }: {
   platform?: AdsPlatform;
   title: string;
   description: string;
+  /** Sarlavha ostiga qo'yiladigan qo'shimcha blok (masalan hisobot yuklash). */
+  toolbar?: ReactNode;
 }) {
   const { current, previous, range, bucket, tokens, isEmpty, isRangeEmpty } =
     useDashboard();
@@ -113,6 +118,7 @@ export function AdsView({
     return (
       <div className="space-y-5">
         <PageHeader title={title} />
+        {toolbar}
         <NoData />
       </div>
     );
@@ -121,6 +127,8 @@ export function AdsView({
   return (
     <div className="space-y-5">
       <PageHeader title={title} description={description} />
+
+      {toolbar}
 
       {isRangeEmpty ? (
         <NoDataInRange />

@@ -17,6 +17,7 @@ import {
 } from "react";
 import {
   EMPTY_DATA,
+  type AdEntry,
   type DashboardData,
   type DatasetKey,
 } from "./types";
@@ -57,6 +58,12 @@ interface StoreValue {
     patch: Partial<Entry<K>>,
   ) => void;
   removeEntry: (key: DatasetKey, id: string) => void;
+  /**
+   * Hisobotdan reklama yozuvlarini olib kirish: sana + platforma + kampaniya
+   * bo'yicha mavjudi topilsa ustiga yoziladi, topilmasa qo'shiladi — bir
+   * hisobotni ikki marta yuklasangiz ham takror yig'ilmaydi.
+   */
+  importAds: (entries: Omit<AdEntry, "id">[]) => { added: number; updated: number };
   /** Bitta bo'limdagi hamma yozuvni o'chiradi (masalan faqat reklamani). */
   clearDataset: (key: DatasetKey) => void;
   replaceAll: (next: DashboardData) => void;
@@ -220,6 +227,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const importAds = useCallback(
+    (entries: Omit<AdEntry, "id">[]) => {
+      // Hisoblash setOwnData ichida emas, joriy holat ustida bajariladi —
+      // StrictMode updater'ni ikki marta chaqirsa ham son ikkilanmaydi.
+      const next = [...ownData.ads];
+      let added = 0;
+      let updated = 0;
+
+      entries.forEach((entry) => {
+        const index = next.findIndex(
+          (row) =>
+            row.date === entry.date &&
+            row.platform === entry.platform &&
+            row.campaign === entry.campaign,
+        );
+        if (index >= 0) {
+          next[index] = { ...next[index], ...entry };
+          updated += 1;
+        } else {
+          next.push({ ...entry, id: newId() });
+          added += 1;
+        }
+      });
+
+      if (added > 0 || updated > 0) {
+        setOwnData((current) => ({ ...current, ads: next }));
+        setDemoDismissed(true);
+      }
+      return { added, updated };
+    },
+    [ownData.ads],
+  );
+
   /** Bitta bo'limni butunlay tozalaydi, qolganlariga tegmaydi. */
   const clearDataset = useCallback((key: DatasetKey) => {
     setOwnData((current) => ({ ...current, [key]: [] }));
@@ -263,6 +303,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addEntry,
       updateEntry,
       removeEntry,
+      importAds,
       clearDataset,
       replaceAll,
       loadDemo,
@@ -281,6 +322,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addEntry,
       updateEntry,
       removeEntry,
+      importAds,
       clearDataset,
       replaceAll,
       loadDemo,
