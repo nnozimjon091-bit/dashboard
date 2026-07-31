@@ -70,6 +70,24 @@ export interface OutboundEntry {
   deals: number;
 }
 
+export type CatalogSource = "clinics_uz" | "med24";
+
+/**
+ * Klinikalar katalogidan (Clinics.uz, Med24) kelgan lidlar — kunlik, katalog
+ * kesimida. `spend` ikki xil mantiqqa ega: Clinics.uz uchun oylik to'lov
+ * qo'lda kiritiladi; Med24 uchun har lid uchun MED24_COST_PER_LEAD narxidan
+ * hisoblanadi (kiritish formasida bo'sh qoldirilsa avtomatik).
+ */
+export interface CatalogEntry {
+  id: string;
+  date: string;
+  catalog: CatalogSource;
+  leads: number;
+  deals: number; // yopilgan sotuvlar
+  revenue: number; // USD
+  spend: number; // USD
+}
+
 export interface DashboardData {
   social: SocialEntry[];
   ads: AdEntry[];
@@ -77,6 +95,7 @@ export interface DashboardData {
   sales: SalesEntry[];
   inbound: InboundEntry[];
   outbound: OutboundEntry[];
+  catalogs: CatalogEntry[];
 }
 
 export type DatasetKey = keyof DashboardData;
@@ -88,6 +107,7 @@ export const EMPTY_DATA: DashboardData = {
   sales: [],
   inbound: [],
   outbound: [],
+  catalogs: [],
 };
 
 // ── Ko'rinadigan nomlar ────────────────────────────────────────────────
@@ -117,6 +137,17 @@ export const SALES_SOURCES: { value: SalesSource; label: string }[] = [
   { value: "google", label: "Google" },
   { value: "boshqa", label: "Boshqa" },
 ];
+
+export const CATALOG_SOURCES: { value: CatalogSource; label: string }[] = [
+  { value: "clinics_uz", label: "Clinics.uz" },
+  { value: "med24", label: "Med24" },
+];
+
+/**
+ * Med24 har bir lid uchun shuncha to'laydi (USD). Kiritish formasida
+ * "Xarajat" maydoni bo'sh qoldirilsa, shu qiymatdan avtomatik hisoblanadi.
+ */
+export const MED24_COST_PER_LEAD = 1;
 
 export function labelFor(
   list: { value: string; label: string }[],

@@ -56,6 +56,7 @@ const NAV: NavItem[] = [
       { href: "/reklama", label: "Umumiy", short: "Reklama" },
       { href: "/reklama/meta", label: "Meta Ads" },
       { href: "/reklama/google", label: "Google Ads" },
+      { href: "/reklama/klinikalar", label: "Klinikalar katalogi" },
     ],
   },
   { href: "/video", label: "Video", Icon: IconVideo, scoped: true },

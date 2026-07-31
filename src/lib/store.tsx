@@ -88,7 +88,8 @@ export function countRows(data: DashboardData): number {
     data.video.length +
     data.sales.length +
     data.inbound.length +
-    data.outbound.length
+    data.outbound.length +
+    data.catalogs.length
   );
 }
 
@@ -107,6 +108,7 @@ function stripDemoRows(data: DashboardData): DashboardData {
     sales: clean(data.sales),
     inbound: clean(data.inbound),
     outbound: clean(data.outbound),
+    catalogs: clean(data.catalogs),
   };
 }
 
@@ -123,6 +125,7 @@ function readStored(): DashboardData | null {
       sales: Array.isArray(parsed.sales) ? parsed.sales : [],
       inbound: Array.isArray(parsed.inbound) ? parsed.inbound : [],
       outbound: Array.isArray(parsed.outbound) ? parsed.outbound : [],
+      catalogs: Array.isArray(parsed.catalogs) ? parsed.catalogs : [],
     });
   } catch {
     return null;

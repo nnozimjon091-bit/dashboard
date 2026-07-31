@@ -11,11 +11,14 @@ import { num, pct, shortDate, usd } from "@/lib/format";
 import { safeDiv } from "@/lib/metrics";
 import {
   ADS_PLATFORMS,
+  CATALOG_SOURCES,
   labelFor,
+  MED24_COST_PER_LEAD,
   SALES_SOURCES,
   SOCIAL_PLATFORMS,
   VIDEO_PLATFORMS,
   type AdsPlatform,
+  type CatalogSource,
   type SalesSource,
   type SocialPlatform,
   type VideoPlatform,
@@ -490,6 +493,106 @@ const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
   ],
 };
 
+const CATALOG_CONFIG: DatasetConfig<"catalogs"> = {
+  dataset: "catalogs",
+  title: "Klinikalar katalogi",
+  hint: "Clinics.uz va Med24'dan kelgan lidlar, kunlik.",
+  fields: [
+    { name: "date", label: "Sana", type: "date" },
+    {
+      name: "catalog",
+      label: "Katalog",
+      type: "select",
+      options: CATALOG_SOURCES,
+    },
+    {
+      name: "leads",
+      label: "Lidlar",
+      type: "number",
+      hint: "Shu katalogdan kelgan murojaatlar",
+    },
+    {
+      name: "deals",
+      label: "Bitimlar",
+      type: "number",
+      hint: "Yopilgan sotuvlar",
+    },
+    { name: "revenue", label: "Daromad (USD)", type: "number", step: "0.01" },
+    {
+      name: "spend",
+      label: "Xarajat (USD)",
+      type: "number",
+      step: "0.01",
+      hint: `Clinics.uz uchun oylik to'lovni kiriting. Med24 uchun bo'sh qoldiring — $${MED24_COST_PER_LEAD}/lid avtomatik hisoblanadi`,
+    },
+  ],
+  defaults: {
+    catalog: "clinics_uz",
+    leads: "",
+    deals: "",
+    revenue: "",
+    spend: "",
+  },
+  toEntry: (values) => {
+    const catalog = values.catalog as CatalogSource;
+    const leads = toNumber(values.leads);
+    const spend =
+      catalog === "med24" && values.spend.trim() === ""
+        ? Number((leads * MED24_COST_PER_LEAD).toFixed(2))
+        : toNumber(values.spend);
+    return {
+      date: values.date,
+      catalog,
+      leads,
+      deals: toNumber(values.deals),
+      revenue: toNumber(values.revenue),
+      spend,
+    };
+  },
+  toValues: (row) => ({
+    date: row.date,
+    catalog: row.catalog,
+    leads: String(row.leads),
+    deals: String(row.deals),
+    revenue: String(row.revenue),
+    spend: String(row.spend),
+  }),
+  isSame: (row, values) =>
+    row.date === values.date && row.catalog === values.catalog,
+  columns: [
+    { key: "date", label: "Sana", render: (row) => shortDate(row.date) },
+    {
+      key: "catalog",
+      label: "Katalog",
+      render: (row) => labelFor(CATALOG_SOURCES, row.catalog),
+    },
+    {
+      key: "leads",
+      label: "Lid",
+      align: "right",
+      render: (row) => num(row.leads),
+    },
+    {
+      key: "deals",
+      label: "Bitim",
+      align: "right",
+      render: (row) => num(row.deals),
+    },
+    {
+      key: "revenue",
+      label: "Daromad",
+      align: "right",
+      render: (row) => usd(row.revenue, 2),
+    },
+    {
+      key: "spend",
+      label: "Xarajat",
+      align: "right",
+      render: (row) => usd(row.spend, 2),
+    },
+  ],
+};
+
 const TABS = [
   { id: "social", label: "Ijtimoiy tarmoq" },
   { id: "ads", label: "Reklama" },
@@ -497,6 +600,7 @@ const TABS = [
   { id: "sales", label: "Sotuv" },
   { id: "inbound", label: "Kiruvchi operator" },
   { id: "outbound", label: "Chiquvchi operator" },
+  { id: "catalogs", label: "Klinikalar katalogi" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -543,6 +647,7 @@ export default function EntryPage() {
       {tab === "sales" ? <EntryPanel config={SALES_CONFIG} /> : null}
       {tab === "inbound" ? <EntryPanel config={INBOUND_CONFIG} /> : null}
       {tab === "outbound" ? <EntryPanel config={OUTBOUND_CONFIG} /> : null}
+      {tab === "catalogs" ? <EntryPanel config={CATALOG_CONFIG} /> : null}
     </div>
   );
 }

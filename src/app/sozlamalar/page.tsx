@@ -5,7 +5,7 @@ import { Button, Card, cx, PageHeader, SectionTitle } from "@/components/ui";
 import { longDate, num } from "@/lib/format";
 import { exportCsv, exportJson, parseImported } from "@/lib/export";
 import { allDates } from "@/lib/metrics";
-import { useStore } from "@/lib/store";
+import { countRows, useStore } from "@/lib/store";
 import { useTheme, type ThemeChoice } from "@/lib/theme";
 import type { DatasetKey } from "@/lib/types";
 
@@ -16,6 +16,7 @@ const DATASETS: { key: DatasetKey; label: string }[] = [
   { key: "sales", label: "Sotuv" },
   { key: "inbound", label: "Kiruvchi operator" },
   { key: "outbound", label: "Chiquvchi operator" },
+  { key: "catalogs", label: "Klinikalar katalogi" },
 ];
 
 const THEME_OPTIONS: { value: ThemeChoice; label: string }[] = [
@@ -44,8 +45,7 @@ export default function SettingsPage() {
   const [confirmDataset, setConfirmDataset] = useState<DatasetKey | null>(null);
 
   const dates = allDates(data).sort();
-  const total =
-    data.social.length + data.ads.length + data.video.length + data.sales.length;
+  const total = countRows(data);
 
   const handleImport = async (file: File) => {
     const result = parseImported(await file.text());

@@ -2,14 +2,16 @@
 // Generator deterministik: bir xil urug' har doim bir xil raqamlarni beradi.
 
 import { addDays, todayISO } from "./metrics";
-import type {
-  AdEntry,
-  DashboardData,
-  InboundEntry,
-  OutboundEntry,
-  SalesEntry,
-  SocialEntry,
-  VideoEntry,
+import {
+  MED24_COST_PER_LEAD,
+  type AdEntry,
+  type CatalogEntry,
+  type DashboardData,
+  type InboundEntry,
+  type OutboundEntry,
+  type SalesEntry,
+  type SocialEntry,
+  type VideoEntry,
 } from "./types";
 
 function mulberry32(seed: number) {
@@ -47,6 +49,7 @@ export function buildDemoData(days = 90): DashboardData {
   const sales: SalesEntry[] = [];
   const inbound: InboundEntry[] = [];
   const outbound: OutboundEntry[] = [];
+  const catalogs: CatalogEntry[] = [];
 
   let igFollowers = 8_240;
   let tgFollowers = 3_115;
@@ -179,7 +182,34 @@ export function buildDemoData(days = 90): DashboardData {
       leads: outLeads,
       deals: Math.max(0, Math.round(outLeads * 0.19 * jitter(0.8))),
     });
+
+    // ── Klinikalar katalogi ──
+    // Clinics.uz: oylik obuna to'lovi, har oyning 1-kunida.
+    const clinicsLeads = Math.max(0, Math.round(4 * weekend * jitter(0.6)));
+    const clinicsDeals = Math.max(0, Math.round(clinicsLeads * 0.22 * jitter(0.8)));
+    catalogs.push({
+      id: `demo-cat-clinics-${date}`,
+      date,
+      catalog: "clinics_uz",
+      leads: clinicsLeads,
+      deals: clinicsDeals,
+      revenue: Number((clinicsDeals * 210 * jitter(0.25)).toFixed(2)),
+      spend: date.slice(8, 10) === "01" ? 150 : 0,
+    });
+
+    // Med24: har lid uchun to'lov — spend leads'dan avtomatik hisoblanadi.
+    const med24Leads = Math.max(0, Math.round(3 * weekend * jitter(0.7)));
+    const med24Deals = Math.max(0, Math.round(med24Leads * 0.2 * jitter(0.8)));
+    catalogs.push({
+      id: `demo-cat-med24-${date}`,
+      date,
+      catalog: "med24",
+      leads: med24Leads,
+      deals: med24Deals,
+      revenue: Number((med24Deals * 220 * jitter(0.25)).toFixed(2)),
+      spend: Number((med24Leads * MED24_COST_PER_LEAD).toFixed(2)),
+    });
   }
 
-  return { social, ads, video, sales, inbound, outbound };
+  return { social, ads, video, sales, inbound, outbound, catalogs };
 }

@@ -26,7 +26,7 @@ npm run start
 |---|---|
 | **Umumiy ko'rinish** | Daromad, xarajat, ROAS, CAC, lidlar, konversiya, auditoriya o'sishi, tagida operatorlar bo'limi |
 | **Ijtimoiy tarmoq** | Instagram va Telegram: obunachilar, qamrov, faollik (ER) |
-| **Reklama** | Uch bo'lim: Umumiy, Meta Ads, Google Ads — byudjet, CTR, CPC, CPM, CPL |
+| **Reklama** | To'rt bo'lim: Umumiy, Meta Ads, Google Ads, Klinikalar katalogi |
 | **Video** | YouTube va TikTok: ko'rishlar, obunachilar, ko'rish soatlari |
 | **Sotuv va lidlar** | Lid → bitim yo'li, kanallarning daromadga hissasi |
 | **Ma'lumot kiritish** | Kunlik ko'rsatkichlarni qo'shish va tahrirlash |
@@ -49,6 +49,7 @@ marta kiritsangiz, yangi yozuv qo'shilmaydi — eskisi yangilanadi.
 | Sotuv | sana, kanal, lidlar, bitimlar, daromad |
 | Kiruvchi operator | sana, kanal, qo'ng'iroqlar, javob berilgan, sotuvlar |
 | Chiquvchi operator | sana, lidlar, bitimlar |
+| Klinikalar katalogi | sana, katalog (Clinics.uz / Med24), lidlar, bitimlar, daromad, xarajat |
 
 **Muhim:** _Reklama_ bo'limidagi lid — faqat pullik reklamadan kelgan murojaat
 (CPL shundan hisoblanadi). _Sotuv_ bo'limidagi lid — sotuv voronkasiga tushgan
@@ -71,6 +72,9 @@ ROAS       = daromad / reklama xarajati
 CAC        = reklama xarajati / bitimlar
 Sof foyda  = daromad − reklama xarajati
 
+Klinikalar ROAS = daromad / xarajat
+Klinikalar CPL  = xarajat / lidlar
+
 Javob berish darajasi = javob berilgan / qo'ng'iroqlar
 O'tkazib yuborilgan   = qo'ng'iroqlar − javob berilgan
 Kiruvchidan sotuv %   = sotuvlar / javob berilgan
@@ -82,6 +86,17 @@ kesimida. O'tkazib yuborilgan qo'ng'iroq alohida kiritilmaydi, jami va javob
 berilgan orasidagi farqdan chiqadi. _Chiquvchi_ — operatorlar qilgan
 qo'ng'iroqlarning natijasi, kunlik jami. Ikkalasi Umumiy ko'rinish sahifasining
 oxirida alohida bo'lim bo'lib chiqadi.
+
+**Klinikalar katalogi** (Reklama guruhi ichida). Clinics.uz va Med24 kabi
+klinika kataloglaridan kelgan lidlar qo'lda kiritiladi. Sahifada "Barchasi /
+Clinics.uz / Med24" filtri bor — filtrga qarab bitta yoki ikkita seriyali
+grafik ko'rsatiladi.
+
+Xarajat maydoni ikki xil mantiqqa ega:
+- **Clinics.uz** — oylik obuna to'lovi, qo'lda kiritiladi.
+- **Med24** — har lid uchun to'lov (standart $1). Kiritish formasida
+  "Xarajat" maydonini **bo'sh qoldirsangiz**, lidlar soniga qarab avtomatik
+  hisoblanadi. Narx o'zgarsa, maydonga qiymat kiritib qo'lda ham yozish mumkin.
 
 ## Google Ads hisobotini yuklash
 

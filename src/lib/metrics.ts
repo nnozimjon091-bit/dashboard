@@ -2,6 +2,7 @@
 
 import type {
   AdEntry,
+  CatalogEntry,
   DashboardData,
   InboundEntry,
   OutboundEntry,
@@ -68,6 +69,7 @@ export function allDates(data: DashboardData): string[] {
     ...data.sales.map((r) => r.date),
     ...data.inbound.map((r) => r.date),
     ...data.outbound.map((r) => r.date),
+    ...data.catalogs.map((r) => r.date),
   ];
 }
 
@@ -115,6 +117,7 @@ export function sliceData(data: DashboardData, range: Range): DashboardData {
     sales: filterRange(data.sales, range),
     inbound: filterRange(data.inbound, range),
     outbound: filterRange(data.outbound, range),
+    catalogs: filterRange(data.catalogs, range),
   };
 }
 
@@ -423,6 +426,32 @@ export function outboundKpis(rows: OutboundEntry[]): OutboundKpis {
   const leads = sum(rows, (r) => r.leads);
   const deals = sum(rows, (r) => r.deals);
   return { leads, deals, conversion: safeDiv(deals, leads) };
+}
+
+export interface CatalogKpis {
+  leads: number;
+  deals: number;
+  revenue: number;
+  spend: number;
+  conversion: number;
+  cpl: number;
+  roas: number;
+}
+
+export function catalogKpis(rows: CatalogEntry[]): CatalogKpis {
+  const leads = sum(rows, (r) => r.leads);
+  const deals = sum(rows, (r) => r.deals);
+  const revenue = sum(rows, (r) => r.revenue);
+  const spend = sum(rows, (r) => r.spend);
+  return {
+    leads,
+    deals,
+    revenue,
+    spend,
+    conversion: safeDiv(deals, leads),
+    cpl: safeDiv(spend, leads),
+    roas: safeDiv(revenue, spend),
+  };
 }
 
 export interface OverviewKpis {

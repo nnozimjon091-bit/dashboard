@@ -35,7 +35,8 @@ const countRows = (data: DashboardData): number =>
   data.video.length +
   data.sales.length +
   data.inbound.length +
-  data.outbound.length;
+  data.outbound.length +
+  data.catalogs.length;
 
 export function useDashboard(): DashboardView {
   const { data, range } = useStore();

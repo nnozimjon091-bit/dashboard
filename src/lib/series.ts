@@ -13,6 +13,7 @@ export const SERIES_ORDER = {
    */
   platform: ["instagram", "telegram", "youtube", "tiktok"],
   adsPlatform: ["meta", "google", "tiktok", "telegram"],
+  catalog: ["clinics_uz", "med24"],
 } as const;
 
 export const SERIES_LABELS: Record<string, string> = {
@@ -26,4 +27,6 @@ export const SERIES_LABELS: Record<string, string> = {
   tiktok: "TikTok",
   meta: "Meta Ads",
   google: "Google Ads",
+  clinics_uz: "Clinics.uz",
+  med24: "Med24",
 };

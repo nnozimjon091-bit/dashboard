@@ -69,7 +69,15 @@ export function parseImported(text: string): ImportResult {
     return { ok: false, error: "Fayl ichida ma'lumot topilmadi." };
   }
   const source = parsed as Partial<Record<DatasetKey, unknown>>;
-  const keys: DatasetKey[] = ["social", "ads", "video", "sales", "inbound", "outbound"];
+  const keys: DatasetKey[] = [
+    "social",
+    "ads",
+    "video",
+    "sales",
+    "inbound",
+    "outbound",
+    "catalogs",
+  ];
   const known = keys.filter((key) => Array.isArray(source[key]));
   if (known.length === 0) {
     return {
@@ -86,6 +94,7 @@ export function parseImported(text: string): ImportResult {
       sales: Array.isArray(source.sales) ? source.sales : [],
       inbound: Array.isArray(source.inbound) ? source.inbound : [],
       outbound: Array.isArray(source.outbound) ? source.outbound : [],
+      catalogs: Array.isArray(source.catalogs) ? source.catalogs : [],
     } as DashboardData,
   };
 }
