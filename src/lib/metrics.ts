@@ -462,6 +462,19 @@ export interface OverviewKpis {
   inbound: InboundKpis;
   outbound: OutboundKpis;
   catalogs: CatalogKpis;
+  /** Reklama xarajati + Klinikalar katalogi xarajati. */
+  totalSpend: number;
+  /** Sotuv daromadi + Klinikalar katalogi daromadi. */
+  totalRevenue: number;
+  /** Sotuv voronkasi lidlari + Klinikalar katalogi lidlari. */
+  totalLeads: number;
+  /** Sotuv bitimlari + Klinikalar katalogi bitimlari. */
+  totalDeals: number;
+  /** Pullik kanallardan (reklama + katalog) kelgan lidlar — CPL uchun. */
+  paidLeads: number;
+  cpl: number;
+  conversion: number;
+  avgCheck: number;
   roas: number;
   cac: number;
   profit: number;
@@ -470,6 +483,19 @@ export interface OverviewKpis {
 export function overviewKpis(data: DashboardData): OverviewKpis {
   const ads = adsKpis(data.ads);
   const sales = salesKpis(data.sales);
+  const catalogs = catalogKpis(data.catalogs);
+
+  // Klinikalar katalogi ham pullik lid manbai (Reklama kabi), ham sotuv
+  // natijasi (daromad/bitim) beradi — shuning uchun ikkala tomonga ham
+  // qo'shiladi: xarajat reklama xarajatiga, daromad/lid/bitim esa sotuv
+  // ko'rsatkichlariga. Aks holda xarajat oshadi-yu, unga mos daromad
+  // hisobga kirmay, ROAS va Sof foyda noto'g'ri chiqadi.
+  const totalSpend = ads.spend + catalogs.spend;
+  const totalRevenue = sales.revenue + catalogs.revenue;
+  const totalLeads = sales.leads + catalogs.leads;
+  const totalDeals = sales.deals + catalogs.deals;
+  const paidLeads = ads.leads + catalogs.leads;
+
   return {
     ads,
     social: socialKpis(data.social),
@@ -477,10 +503,18 @@ export function overviewKpis(data: DashboardData): OverviewKpis {
     sales,
     inbound: inboundKpis(data.inbound),
     outbound: outboundKpis(data.outbound),
-    catalogs: catalogKpis(data.catalogs),
-    roas: safeDiv(sales.revenue, ads.spend),
-    cac: safeDiv(ads.spend, sales.deals),
-    profit: sales.revenue - ads.spend,
+    catalogs,
+    totalSpend,
+    totalRevenue,
+    totalLeads,
+    totalDeals,
+    paidLeads,
+    cpl: safeDiv(totalSpend, paidLeads),
+    conversion: safeDiv(totalDeals, totalLeads),
+    avgCheck: safeDiv(totalRevenue, totalDeals),
+    roas: safeDiv(totalRevenue, totalSpend),
+    cac: safeDiv(totalSpend, totalDeals),
+    profit: totalRevenue - totalSpend,
   };
 }
 

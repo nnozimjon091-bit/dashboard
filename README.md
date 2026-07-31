@@ -92,9 +92,18 @@ klinika kataloglaridan kelgan lidlar qo'lda kiritiladi. Sahifada "Barchasi /
 Clinics.uz / Med24" filtri bor — filtrga qarab bitta yoki ikkita seriyali
 grafik ko'rsatiladi.
 
-Umumiy ko'rinish sahifasining oxirida ham alohida "Klinikalar katalogi"
-bo'limi bor (Operatorlar bilan bir qatorda) — u har doim ikkala katalogni
-birga ko'rsatadi.
+Klinikalar katalogining xarajati va daromadi **Umumiy ko'rinishdagi asosiy
+ko'rsatkichlarga qo'shib hisoblanadi** — alohida bo'lim sifatida emas:
+
+```
+Umumiy xarajat = Reklama xarajati (barcha platforma) + Klinikalar xarajati
+Umumiy daromad = Sotuv daromadi + Klinikalar daromadi
+Lidlar / Bitimlar / Konversiya — xuddi shunday, Sotuv + Klinikalar yig'indisi
+```
+
+Shu sababli Sof foyda, ROAS va CAC har doim to'liq rasmni ko'rsatadi: xarajat
+oshsa, unga mos daromad ham hisobga kiradi. "Lidlar manba bo'yicha" grafigida
+ham Clinics.uz va Med24 boshqa kanallar qatorida alohida ustun bo'lib chiqadi.
 
 Xarajat maydoni ikki xil mantiqqa ega:
 - **Clinics.uz** — oylik obuna to'lovi, qo'lda kiritiladi.

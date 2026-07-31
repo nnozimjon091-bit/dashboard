@@ -31,15 +31,39 @@ export default function OverviewPage() {
     seriesColor(tokens, key, SERIES_ORDER[group]);
 
   // Daromad va xarajat — ikkalasi ham USD, shuning uchun bitta o'qda.
-  const money = mergeSeries(
-    buildSeries(current.sales, range, bucket, { revenue: (row) => row.revenue }),
-    buildSeries(current.ads, range, bucket, { spend: (row) => row.spend }),
-  );
+  // Klinikalar katalogi ham xarajat, ham daromad beradi — shuning uchun
+  // bu yerda ham qo'shib hisoblanadi (kpi.totalSpend/totalRevenue kabi).
+  const revenueSeries = buildSeries(current.sales, range, bucket, {
+    revenue: (row) => row.revenue,
+  });
+  const spendSeries = buildSeries(current.ads, range, bucket, {
+    spend: (row) => row.spend,
+  });
+  const catalogMoneySeries = buildSeries(current.catalogs, range, bucket, {
+    revenue: (row) => row.revenue,
+    spend: (row) => row.spend,
+  });
+  const money: SeriesPoint[] = revenueSeries.map((point, index) => ({
+    key: point.key,
+    label: point.label,
+    revenue: Number(point.revenue) + Number(catalogMoneySeries[index].revenue),
+    spend: Number(spendSeries[index].spend) + Number(catalogMoneySeries[index].spend),
+  }));
 
-  const funnel = buildSeries(current.sales, range, bucket, {
+  const salesFunnel = buildSeries(current.sales, range, bucket, {
     leads: (row) => row.leads,
     deals: (row) => row.deals,
   });
+  const catalogFunnel = buildSeries(current.catalogs, range, bucket, {
+    leads: (row) => row.leads,
+    deals: (row) => row.deals,
+  });
+  const funnel: SeriesPoint[] = salesFunnel.map((point, index) => ({
+    key: point.key,
+    label: point.label,
+    leads: Number(point.leads) + Number(catalogFunnel[index].leads),
+    deals: Number(point.deals) + Number(catalogFunnel[index].deals),
+  }));
 
   const audience = mergeSeries(
     buildStockSeries(current.social, range, bucket, {
@@ -64,13 +88,24 @@ export default function OverviewPage() {
     }),
   );
 
-  const leadsBySource = SALES_SOURCES.map((source) => ({
-    label: source.label,
-    value: sum(
-      current.sales.filter((row) => row.source === source.value),
-      (row) => row.leads,
-    ),
-  }))
+  // Klinikalar katalogi ham lid manbai — shuning uchun shu ro'yxatga
+  // Clinics.uz va Med24 ham qo'shiladi, jami esa kpi.totalLeads bilan mos keladi.
+  const leadsBySource = [
+    ...SALES_SOURCES.map((source) => ({
+      label: source.label,
+      value: sum(
+        current.sales.filter((row) => row.source === source.value),
+        (row) => row.leads,
+      ),
+    })),
+    ...CATALOG_SOURCES.map((source) => ({
+      label: source.label,
+      value: sum(
+        current.catalogs.filter((row) => row.catalog === source.value),
+        (row) => row.leads,
+      ),
+    })),
+  ]
     .filter((row) => row.value > 0)
     .sort((a, b) => b.value - a.value);
 
@@ -85,21 +120,6 @@ export default function OverviewPage() {
     value: sum(
       current.inbound.filter((row) => row.source === source.value),
       (row) => row.calls,
-    ),
-  }))
-    .filter((row) => row.value > 0)
-    .sort((a, b) => b.value - a.value);
-
-  const catalogLeadsSeries = buildSeries(current.catalogs, range, bucket, {
-    clinics_uz: (row) => (row.catalog === "clinics_uz" ? row.leads : 0),
-    med24: (row) => (row.catalog === "med24" ? row.leads : 0),
-  });
-
-  const catalogRevenueBySource = CATALOG_SOURCES.map((source) => ({
-    label: source.label,
-    value: sum(
-      current.catalogs.filter((row) => row.catalog === source.value),
-      (row) => row.revenue,
     ),
   }))
     .filter((row) => row.value > 0)
@@ -130,9 +150,9 @@ export default function OverviewPage() {
         <>
           <HeroStat
             label="Umumiy daromad"
-            value={usdCompact(kpi.sales.revenue)}
-            delta={delta(kpi.sales.revenue, prev.sales.revenue)}
-            caption="oldingi davrga nisbatan"
+            value={usdCompact(kpi.totalRevenue)}
+            delta={delta(kpi.totalRevenue, prev.totalRevenue)}
+            caption="oldingi davrga nisbatan · sotuv + klinikalar katalogi"
           >
             <dl className="grid grid-cols-3 gap-x-6 gap-y-2 text-sm">
               <Mini label="Sof foyda" value={usd(kpi.profit)} />
@@ -143,38 +163,39 @@ export default function OverviewPage() {
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatTile
-              label="Reklama xarajati"
-              value={usdCompact(kpi.ads.spend)}
-              delta={delta(kpi.ads.spend, prev.ads.spend)}
+              label="Umumiy xarajat"
+              value={usdCompact(kpi.totalSpend)}
+              delta={delta(kpi.totalSpend, prev.totalSpend)}
               goodWhen="neutral"
+              hint="reklama + klinikalar katalogi"
             />
             <StatTile
               label="Lidlar"
-              value={num(kpi.sales.leads)}
-              delta={delta(kpi.sales.leads, prev.sales.leads)}
+              value={num(kpi.totalLeads)}
+              delta={delta(kpi.totalLeads, prev.totalLeads)}
             />
             <StatTile
               label="Bitimlar"
-              value={num(kpi.sales.deals)}
-              delta={delta(kpi.sales.deals, prev.sales.deals)}
+              value={num(kpi.totalDeals)}
+              delta={delta(kpi.totalDeals, prev.totalDeals)}
             />
             <StatTile
               label="Konversiya"
-              value={pct(kpi.sales.conversion)}
-              delta={delta(kpi.sales.conversion, prev.sales.conversion)}
+              value={pct(kpi.conversion)}
+              delta={delta(kpi.conversion, prev.conversion)}
               hint="lid → bitim"
             />
             <StatTile
               label="Lid narxi (CPL)"
-              value={usdFine(kpi.ads.cpl)}
-              delta={delta(kpi.ads.cpl, prev.ads.cpl)}
+              value={usdFine(kpi.cpl)}
+              delta={delta(kpi.cpl, prev.cpl)}
               goodWhen="down"
-              hint="reklama lidlari"
+              hint="reklama + katalog lidlari"
             />
             <StatTile
               label="O'rtacha chek"
-              value={usdFine(kpi.sales.avgCheck)}
-              delta={delta(kpi.sales.avgCheck, prev.sales.avgCheck)}
+              value={usdFine(kpi.avgCheck)}
+              delta={delta(kpi.avgCheck, prev.avgCheck)}
             />
             <StatTile
               label="Jami auditoriya"
@@ -191,11 +212,11 @@ export default function OverviewPage() {
 
           <div className="grid gap-4 xl:grid-cols-2">
             <ChartCard<SeriesPoint>
-              title="Daromad va reklama xarajati"
-              subtitle="USD"
+              title="Daromad va xarajat"
+              subtitle="USD · sotuv + reklama + klinikalar katalogi"
               legend={[
                 { name: "Daromad", color: color("money", "revenue") },
-                { name: "Reklama xarajati", color: color("money", "spend") },
+                { name: "Xarajat", color: color("money", "spend") },
               ]}
               table={{
                 rows: money,
@@ -228,7 +249,7 @@ export default function OverviewPage() {
                   },
                   {
                     key: "spend",
-                    name: "Reklama xarajati",
+                    name: "Xarajat",
                     color: color("money", "spend"),
                   },
                 ]}
@@ -370,119 +391,6 @@ export default function OverviewPage() {
               />
             </ChartCard>
           </div>
-
-          <section>
-            <SectionTitle
-              title="Klinikalar katalogi"
-              hint="Clinics.uz va Med24'dan kelgan lidlar"
-            />
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <StatTile
-                label="Lidlar"
-                value={num(kpi.catalogs.leads)}
-                delta={delta(kpi.catalogs.leads, prev.catalogs.leads)}
-              />
-              <StatTile
-                label="Bitimlar"
-                value={num(kpi.catalogs.deals)}
-                delta={delta(kpi.catalogs.deals, prev.catalogs.deals)}
-              />
-              <StatTile
-                label="Konversiya"
-                value={pct(kpi.catalogs.conversion)}
-                delta={delta(kpi.catalogs.conversion, prev.catalogs.conversion)}
-                hint="lid → bitim"
-              />
-              <StatTile
-                label="Daromad"
-                value={usdCompact(kpi.catalogs.revenue)}
-                delta={delta(kpi.catalogs.revenue, prev.catalogs.revenue)}
-              />
-              <StatTile
-                label="Xarajat"
-                value={usdCompact(kpi.catalogs.spend)}
-                delta={delta(kpi.catalogs.spend, prev.catalogs.spend)}
-                goodWhen="neutral"
-                hint="Clinics.uz oylik to'lov + Med24 lid narxi"
-              />
-              <StatTile
-                label="ROAS"
-                value={ratio(kpi.catalogs.roas)}
-                delta={delta(kpi.catalogs.roas, prev.catalogs.roas)}
-                hint="daromad / xarajat"
-              />
-            </div>
-
-            <div className="mt-4 grid gap-4 xl:grid-cols-2">
-              <ChartCard<SeriesPoint>
-                title="Kataloglardan lidlar"
-                subtitle="soni"
-                legend={[
-                  { name: "Clinics.uz", color: color("catalog", "clinics_uz") },
-                  { name: "Med24", color: color("catalog", "med24") },
-                ]}
-                table={{
-                  rows: catalogLeadsSeries,
-                  rowKey: (row) => String(row.key),
-                  columns: [
-                    { key: "label", label: "Davr", render: (row) => row.label },
-                    {
-                      key: "clinics_uz",
-                      label: "Clinics.uz",
-                      align: "right",
-                      render: (row) => num(Number(row.clinics_uz)),
-                    },
-                    {
-                      key: "med24",
-                      label: "Med24",
-                      align: "right",
-                      render: (row) => num(Number(row.med24)),
-                    },
-                  ],
-                }}
-              >
-                <ColumnChart
-                  data={catalogLeadsSeries}
-                  format={(value) => num(value)}
-                  series={[
-                    {
-                      key: "clinics_uz",
-                      name: "Clinics.uz",
-                      color: color("catalog", "clinics_uz"),
-                    },
-                    {
-                      key: "med24",
-                      name: "Med24",
-                      color: color("catalog", "med24"),
-                    },
-                  ]}
-                />
-              </ChartCard>
-
-              <ChartCard<{ label: string; value: number }>
-                title="Kataloglar bo'yicha daromad"
-                subtitle="tanlangan davrdagi jami"
-                table={{
-                  rows: catalogRevenueBySource,
-                  rowKey: (row) => row.label,
-                  columns: [
-                    { key: "label", label: "Katalog", render: (row) => row.label },
-                    {
-                      key: "value",
-                      label: "Daromad",
-                      align: "right",
-                      render: (row) => usd(row.value),
-                    },
-                  ],
-                }}
-              >
-                <CategoryBarChart
-                  data={catalogRevenueBySource}
-                  format={(value) => usdCompact(value)}
-                />
-              </ChartCard>
-            </div>
-          </section>
 
           <section>
             <SectionTitle
