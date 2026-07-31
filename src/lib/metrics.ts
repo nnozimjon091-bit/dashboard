@@ -461,6 +461,7 @@ export interface OverviewKpis {
   sales: SalesKpis;
   inbound: InboundKpis;
   outbound: OutboundKpis;
+  catalogs: CatalogKpis;
   roas: number;
   cac: number;
   profit: number;
@@ -476,6 +477,7 @@ export function overviewKpis(data: DashboardData): OverviewKpis {
     sales,
     inbound: inboundKpis(data.inbound),
     outbound: outboundKpis(data.outbound),
+    catalogs: catalogKpis(data.catalogs),
     roas: safeDiv(sales.revenue, ads.spend),
     cac: safeDiv(ads.spend, sales.deals),
     profit: sales.revenue - ads.spend,

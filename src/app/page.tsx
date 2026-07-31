@@ -17,7 +17,7 @@ import {
 } from "@/lib/metrics";
 import { seriesColor } from "@/lib/palette";
 import { SERIES_ORDER } from "@/lib/series";
-import { SALES_SOURCES } from "@/lib/types";
+import { CATALOG_SOURCES, SALES_SOURCES } from "@/lib/types";
 import { useDashboard } from "@/lib/use-dashboard";
 
 export default function OverviewPage() {
@@ -85,6 +85,21 @@ export default function OverviewPage() {
     value: sum(
       current.inbound.filter((row) => row.source === source.value),
       (row) => row.calls,
+    ),
+  }))
+    .filter((row) => row.value > 0)
+    .sort((a, b) => b.value - a.value);
+
+  const catalogLeadsSeries = buildSeries(current.catalogs, range, bucket, {
+    clinics_uz: (row) => (row.catalog === "clinics_uz" ? row.leads : 0),
+    med24: (row) => (row.catalog === "med24" ? row.leads : 0),
+  });
+
+  const catalogRevenueBySource = CATALOG_SOURCES.map((source) => ({
+    label: source.label,
+    value: sum(
+      current.catalogs.filter((row) => row.catalog === source.value),
+      (row) => row.revenue,
     ),
   }))
     .filter((row) => row.value > 0)
@@ -355,6 +370,119 @@ export default function OverviewPage() {
               />
             </ChartCard>
           </div>
+
+          <section>
+            <SectionTitle
+              title="Klinikalar katalogi"
+              hint="Clinics.uz va Med24'dan kelgan lidlar"
+            />
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <StatTile
+                label="Lidlar"
+                value={num(kpi.catalogs.leads)}
+                delta={delta(kpi.catalogs.leads, prev.catalogs.leads)}
+              />
+              <StatTile
+                label="Bitimlar"
+                value={num(kpi.catalogs.deals)}
+                delta={delta(kpi.catalogs.deals, prev.catalogs.deals)}
+              />
+              <StatTile
+                label="Konversiya"
+                value={pct(kpi.catalogs.conversion)}
+                delta={delta(kpi.catalogs.conversion, prev.catalogs.conversion)}
+                hint="lid → bitim"
+              />
+              <StatTile
+                label="Daromad"
+                value={usdCompact(kpi.catalogs.revenue)}
+                delta={delta(kpi.catalogs.revenue, prev.catalogs.revenue)}
+              />
+              <StatTile
+                label="Xarajat"
+                value={usdCompact(kpi.catalogs.spend)}
+                delta={delta(kpi.catalogs.spend, prev.catalogs.spend)}
+                goodWhen="neutral"
+                hint="Clinics.uz oylik to'lov + Med24 lid narxi"
+              />
+              <StatTile
+                label="ROAS"
+                value={ratio(kpi.catalogs.roas)}
+                delta={delta(kpi.catalogs.roas, prev.catalogs.roas)}
+                hint="daromad / xarajat"
+              />
+            </div>
+
+            <div className="mt-4 grid gap-4 xl:grid-cols-2">
+              <ChartCard<SeriesPoint>
+                title="Kataloglardan lidlar"
+                subtitle="soni"
+                legend={[
+                  { name: "Clinics.uz", color: color("catalog", "clinics_uz") },
+                  { name: "Med24", color: color("catalog", "med24") },
+                ]}
+                table={{
+                  rows: catalogLeadsSeries,
+                  rowKey: (row) => String(row.key),
+                  columns: [
+                    { key: "label", label: "Davr", render: (row) => row.label },
+                    {
+                      key: "clinics_uz",
+                      label: "Clinics.uz",
+                      align: "right",
+                      render: (row) => num(Number(row.clinics_uz)),
+                    },
+                    {
+                      key: "med24",
+                      label: "Med24",
+                      align: "right",
+                      render: (row) => num(Number(row.med24)),
+                    },
+                  ],
+                }}
+              >
+                <ColumnChart
+                  data={catalogLeadsSeries}
+                  format={(value) => num(value)}
+                  series={[
+                    {
+                      key: "clinics_uz",
+                      name: "Clinics.uz",
+                      color: color("catalog", "clinics_uz"),
+                    },
+                    {
+                      key: "med24",
+                      name: "Med24",
+                      color: color("catalog", "med24"),
+                    },
+                  ]}
+                />
+              </ChartCard>
+
+              <ChartCard<{ label: string; value: number }>
+                title="Kataloglar bo'yicha daromad"
+                subtitle="tanlangan davrdagi jami"
+                table={{
+                  rows: catalogRevenueBySource,
+                  rowKey: (row) => row.label,
+                  columns: [
+                    { key: "label", label: "Katalog", render: (row) => row.label },
+                    {
+                      key: "value",
+                      label: "Daromad",
+                      align: "right",
+                      render: (row) => usd(row.value),
+                    },
+                  ],
+                }}
+              >
+                <CategoryBarChart
+                  data={catalogRevenueBySource}
+                  format={(value) => usdCompact(value)}
+                />
+              </ChartCard>
+            </div>
+          </section>
 
           <section>
             <SectionTitle

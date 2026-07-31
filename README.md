@@ -92,6 +92,10 @@ klinika kataloglaridan kelgan lidlar qo'lda kiritiladi. Sahifada "Barchasi /
 Clinics.uz / Med24" filtri bor — filtrga qarab bitta yoki ikkita seriyali
 grafik ko'rsatiladi.
 
+Umumiy ko'rinish sahifasining oxirida ham alohida "Klinikalar katalogi"
+bo'limi bor (Operatorlar bilan bir qatorda) — u har doim ikkala katalogni
+birga ko'rsatadi.
+
 Xarajat maydoni ikki xil mantiqqa ega:
 - **Clinics.uz** — oylik obuna to'lovi, qo'lda kiritiladi.
 - **Med24** — har lid uchun to'lov (standart $1). Kiritish formasida
