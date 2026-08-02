@@ -289,11 +289,9 @@ export default function SocialPage() {
                 title="Instagram Story"
                 hint="tanlangan davr bo'yicha"
               />
-              <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <dl className="grid grid-cols-2 gap-4">
+                <Mini label="Storieslar soni" value={num(storyKpi.posts)} />
                 <Mini label="Qamrov" value={compact(storyKpi.reach)} />
-                <Mini label="Faollik" value={compact(storyKpi.engagement)} />
-                <Mini label="ER" value={pct(storyKpi.er)} />
-                <Mini label="Postlar" value={num(storyKpi.posts)} />
               </dl>
             </Card>
           </div>
