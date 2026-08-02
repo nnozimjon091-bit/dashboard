@@ -28,22 +28,57 @@ export default function SalesPage() {
   const prev = salesKpis(previous.sales);
   const ads = adsKpis(current.ads);
   const prevAds = adsKpis(previous.ads);
+  const outbound = outboundKpis(current.outbound);
+  const prevOutbound = outboundKpis(previous.outbound);
 
-  const roas = safeDiv(kpi.revenue, ads.spend);
-  const prevRoas = safeDiv(prev.revenue, prevAds.spend);
-  const cac = safeDiv(ads.spend, kpi.deals);
-  const prevCac = safeDiv(prevAds.spend, prev.deals);
+  // Chiquvchi operator ham sotuv natijasi (lid/bitim/daromad) beradi —
+  // shuning uchun sahifaning umumiy ko'rsatkichlariga qo'shiladi, xuddi
+  // Umumiy ko'rinishdagi kabi (kpi.totalRevenue va h.k.).
+  const totalRevenue = kpi.revenue + outbound.revenue;
+  const totalLeads = kpi.leads + outbound.leads;
+  const totalDeals = kpi.deals + outbound.deals;
+  const totalConversion = safeDiv(totalDeals, totalLeads);
+  const totalAvgCheck = safeDiv(totalRevenue, totalDeals);
+
+  const prevTotalRevenue = prev.revenue + prevOutbound.revenue;
+  const prevTotalLeads = prev.leads + prevOutbound.leads;
+  const prevTotalDeals = prev.deals + prevOutbound.deals;
+  const prevTotalConversion = safeDiv(prevTotalDeals, prevTotalLeads);
+  const prevTotalAvgCheck = safeDiv(prevTotalRevenue, prevTotalDeals);
+
+  const roas = safeDiv(totalRevenue, ads.spend);
+  const prevRoas = safeDiv(prevTotalRevenue, prevAds.spend);
+  const cac = safeDiv(ads.spend, totalDeals);
+  const prevCac = safeDiv(prevAds.spend, prevTotalDeals);
 
   const color = (key: string) => seriesColor(tokens, key, SERIES_ORDER.funnel);
 
-  const revenue = buildSeries(current.sales, range, bucket, {
+  const salesRevenue = buildSeries(current.sales, range, bucket, {
     revenue: (row) => row.revenue,
   });
+  const outboundRevenue = buildSeries(current.outbound, range, bucket, {
+    revenue: (row) => row.revenue,
+  });
+  const revenue: SeriesPoint[] = salesRevenue.map((point, index) => ({
+    key: point.key,
+    label: point.label,
+    revenue: Number(point.revenue) + Number(outboundRevenue[index].revenue),
+  }));
 
-  const funnel = buildSeries(current.sales, range, bucket, {
+  const salesFunnel = buildSeries(current.sales, range, bucket, {
     leads: (row) => row.leads,
     deals: (row) => row.deals,
   });
+  const outboundFunnel = buildSeries(current.outbound, range, bucket, {
+    leads: (row) => row.leads,
+    deals: (row) => row.deals,
+  });
+  const funnel: SeriesPoint[] = salesFunnel.map((point, index) => ({
+    key: point.key,
+    label: point.label,
+    leads: Number(point.leads) + Number(outboundFunnel[index].leads),
+    deals: Number(point.deals) + Number(outboundFunnel[index].deals),
+  }));
 
   const bySource = SALES_SOURCES.map((source) => {
     const rows = current.sales.filter((row) => row.source === source.value);
@@ -88,9 +123,9 @@ export default function SalesPage() {
         <>
           <HeroStat
             label="Daromad"
-            value={usdCompact(kpi.revenue)}
-            delta={delta(kpi.revenue, prev.revenue)}
-            caption="oldingi davrga nisbatan"
+            value={usdCompact(totalRevenue)}
+            delta={delta(totalRevenue, prevTotalRevenue)}
+            caption="oldingi davrga nisbatan · sotuv + chiquvchi operator"
           >
             <dl className="grid grid-cols-3 gap-x-6 gap-y-2 text-sm">
               <div>
@@ -104,7 +139,7 @@ export default function SalesPage() {
               <div>
                 <dt className="text-xs text-ink-3">Sof foyda</dt>
                 <dd className="mt-0.5 font-semibold">
-                  {usd(kpi.revenue - ads.spend)}
+                  {usd(totalRevenue - ads.spend)}
                 </dd>
               </div>
             </dl>
@@ -113,24 +148,24 @@ export default function SalesPage() {
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatTile
               label="Lidlar"
-              value={num(kpi.leads)}
-              delta={delta(kpi.leads, prev.leads)}
+              value={num(totalLeads)}
+              delta={delta(totalLeads, prevTotalLeads)}
             />
             <StatTile
               label="Bitimlar"
-              value={num(kpi.deals)}
-              delta={delta(kpi.deals, prev.deals)}
+              value={num(totalDeals)}
+              delta={delta(totalDeals, prevTotalDeals)}
             />
             <StatTile
               label="Konversiya"
-              value={pct(kpi.conversion)}
-              delta={delta(kpi.conversion, prev.conversion)}
+              value={pct(totalConversion)}
+              delta={delta(totalConversion, prevTotalConversion)}
               hint="lid → bitim"
             />
             <StatTile
               label="O'rtacha chek"
-              value={usdFine(kpi.avgCheck)}
-              delta={delta(kpi.avgCheck, prev.avgCheck)}
+              value={usdFine(totalAvgCheck)}
+              delta={delta(totalAvgCheck, prevTotalAvgCheck)}
             />
             <StatTile
               label="ROAS"
@@ -146,10 +181,10 @@ export default function SalesPage() {
             />
             <StatTile
               label="Sof foyda"
-              value={usdCompact(kpi.revenue - ads.spend)}
+              value={usdCompact(totalRevenue - ads.spend)}
               delta={delta(
-                kpi.revenue - ads.spend,
-                prev.revenue - prevAds.spend,
+                totalRevenue - ads.spend,
+                prevTotalRevenue - prevAds.spend,
               )}
             />
             <StatTile

@@ -31,8 +31,9 @@ export default function OverviewPage() {
     seriesColor(tokens, key, SERIES_ORDER[group]);
 
   // Daromad va xarajat — ikkalasi ham USD, shuning uchun bitta o'qda.
-  // Klinikalar katalogi ham xarajat, ham daromad beradi — shuning uchun
-  // bu yerda ham qo'shib hisoblanadi (kpi.totalSpend/totalRevenue kabi).
+  // Klinikalar katalogi ham xarajat, ham daromad beradi, Chiquvchi operator
+  // esa faqat daromad — shuning uchun bu yerda ham qo'shib hisoblanadi
+  // (kpi.totalSpend/totalRevenue kabi).
   const revenueSeries = buildSeries(current.sales, range, bucket, {
     revenue: (row) => row.revenue,
   });
@@ -43,10 +44,16 @@ export default function OverviewPage() {
     revenue: (row) => row.revenue,
     spend: (row) => row.spend,
   });
+  const outboundMoneySeries = buildSeries(current.outbound, range, bucket, {
+    revenue: (row) => row.revenue,
+  });
   const money: SeriesPoint[] = revenueSeries.map((point, index) => ({
     key: point.key,
     label: point.label,
-    revenue: Number(point.revenue) + Number(catalogMoneySeries[index].revenue),
+    revenue:
+      Number(point.revenue) +
+      Number(catalogMoneySeries[index].revenue) +
+      Number(outboundMoneySeries[index].revenue),
     spend: Number(spendSeries[index].spend) + Number(catalogMoneySeries[index].spend),
   }));
 
@@ -58,11 +65,21 @@ export default function OverviewPage() {
     leads: (row) => row.leads,
     deals: (row) => row.deals,
   });
+  const outboundFunnel = buildSeries(current.outbound, range, bucket, {
+    leads: (row) => row.leads,
+    deals: (row) => row.deals,
+  });
   const funnel: SeriesPoint[] = salesFunnel.map((point, index) => ({
     key: point.key,
     label: point.label,
-    leads: Number(point.leads) + Number(catalogFunnel[index].leads),
-    deals: Number(point.deals) + Number(catalogFunnel[index].deals),
+    leads:
+      Number(point.leads) +
+      Number(catalogFunnel[index].leads) +
+      Number(outboundFunnel[index].leads),
+    deals:
+      Number(point.deals) +
+      Number(catalogFunnel[index].deals) +
+      Number(outboundFunnel[index].deals),
   }));
 
   const audience = mergeSeries(

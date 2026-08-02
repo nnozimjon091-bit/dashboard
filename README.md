@@ -28,7 +28,7 @@ npm run start
 | **Ijtimoiy tarmoq** | Instagram va Telegram: obunachilar, qamrov, faollik (ER); Instagram Story alohida kartochkada |
 | **Reklama** | To'rt bo'lim: Umumiy, Meta Ads, Google Ads, Klinikalar katalogi; Meta Ads'da lead yo'nalishi bo'yicha ROMI |
 | **Video** | YouTube va TikTok: ko'rishlar, obunachilar, ko'rish soatlari; YouTube uchun alohida bo'lim (videolar, shorts, yangi obunachilar) |
-| **Sotuv va lidlar** | Lid → bitim yo'li, kanallarning daromadga hissasi, chiquvchi lidlarning yo'nalish kesimi |
+| **Sotuv va lidlar** | Lid → bitim yo'li, kanallarning daromadga hissasi (Sotuv + Chiquvchi operator jami), chiquvchi lidlarning yo'nalish kesimi |
 | **Ma'lumot kiritish** | Kunlik ko'rsatkichlarni qo'shish va tahrirlash |
 | **Sozlamalar** | Mavzu, zaxira nusxa (JSON), CSV eksport, demo/tozalash |
 
@@ -82,9 +82,11 @@ ROMI (yo'nalish) = chiquvchi operator daromadi / Meta Ads xarajati (shu yo'nalis
 **Chiquvchi operator bo'limi.** Operatorlar qilgan chiquvchi qo'ng'iroqlarning
 natijasi, lead yo'nalishi (Urolog, Dermatolog va h.k.) kesimida, daromad bilan;
 yo'nalish bo'yicha hisobot _Sotuv va lidlar_ sahifasida chiqadi, lidlari/
-bitimlari/daromadi esa Umumiy ko'rinishning **Umumiy lidlar / bitimlar /
-daromad** jamiga ham qo'shiladi (Klinikalar katalogi kabi) — faqat xarajat
-tomoni yo'q, chunki bu lidlarning Meta Ads xarajati reklama xarajatida
+bitimlari/daromadi esa **Sotuv va lidlar** sahifasining o'z jami (Daromad,
+Lidlar, Bitimlar, Konversiya, O'rt. chek, ROAS, CAC, Sof foyda) va Umumiy
+ko'rinishning **Umumiy lidlar / bitimlar / daromad** jamiga ham qo'shiladi
+(Klinikalar katalogi kabi) — faqat xarajat tomoni yo'q, chunki bu lidlarning
+Meta Ads xarajati reklama xarajatida
 allaqachon hisobga olingan.
 
 **Meta Ads → Chiquvchi operator bog'lanishi.** Meta Ads kampaniyasi kiritilganda
