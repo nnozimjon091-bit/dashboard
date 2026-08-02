@@ -394,25 +394,17 @@ export function salesKpis(rows: SalesEntry[]): SalesKpis {
 
 export interface InboundKpis {
   calls: number;
-  answered: number;
-  missed: number;
   deals: number;
-  answerRate: number;
-  dealRate: number;
+  conversion: number;
 }
 
 export function inboundKpis(rows: InboundEntry[]): InboundKpis {
   const calls = sum(rows, (r) => r.calls);
-  const answered = sum(rows, (r) => r.answered);
   const deals = sum(rows, (r) => r.deals);
   return {
     calls,
-    answered,
-    // Javob berilmagani qo'lda kiritilmaydi — farqdan chiqadi.
-    missed: Math.max(0, calls - answered),
     deals,
-    answerRate: safeDiv(answered, calls),
-    dealRate: safeDiv(deals, answered),
+    conversion: safeDiv(deals, calls),
   };
 }
 

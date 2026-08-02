@@ -160,17 +160,12 @@ export function buildDemoData(days = 90): DashboardData {
       // Har bir lid ortida bir nechta qo'ng'iroq bo'ladi.
       const calls = Math.max(0, Math.round(leads * 1.8 * jitter(0.4)));
       if (calls === 0) return;
-      const answered = Math.min(
-        calls,
-        Math.round(calls * (0.86 * jitter(0.15))),
-      );
       inbound.push({
         id: `demo-in-${order}-${date}`,
         date,
         source,
         calls,
-        answered,
-        deals: Math.max(0, Math.round(answered * 0.16 * jitter(0.7))),
+        deals: Math.max(0, Math.round(calls * 0.14 * jitter(0.7))),
       });
     });
 

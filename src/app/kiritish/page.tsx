@@ -376,31 +376,23 @@ const INBOUND_CONFIG: DatasetConfig<"inbound"> = {
       hint: "Shu kanaldan kelgan jami qo'ng'iroqlar",
     },
     {
-      name: "answered",
-      label: "Javob berilgan",
-      type: "number",
-      hint: "Ko'tarilgani. Qolgani o'tkazib yuborilgan deb hisoblanadi",
-    },
-    {
       name: "deals",
       label: "Sotuvlar",
       type: "number",
       hint: "Shu qo'ng'iroqlardan chiqqan bitimlar",
     },
   ],
-  defaults: { source: "maps", calls: "", answered: "", deals: "" },
+  defaults: { source: "maps", calls: "", deals: "" },
   toEntry: (values) => ({
     date: values.date,
     source: values.source as SalesSource,
     calls: toNumber(values.calls),
-    answered: toNumber(values.answered),
     deals: toNumber(values.deals),
   }),
   toValues: (row) => ({
     date: row.date,
     source: row.source,
     calls: String(row.calls),
-    answered: String(row.answered),
     deals: String(row.deals),
   }),
   isSame: (row, values) =>
@@ -417,18 +409,6 @@ const INBOUND_CONFIG: DatasetConfig<"inbound"> = {
       label: "Qo'ng'iroq",
       align: "right",
       render: (row) => num(row.calls),
-    },
-    {
-      key: "answered",
-      label: "Javob",
-      align: "right",
-      render: (row) => num(row.answered),
-    },
-    {
-      key: "rate",
-      label: "Javob %",
-      align: "right",
-      render: (row) => pct(safeDiv(row.answered, row.calls)),
     },
     {
       key: "deals",

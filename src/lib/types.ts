@@ -59,7 +59,6 @@ export interface InboundEntry {
   date: string;
   source: SalesSource;
   calls: number; // jami kelgan qo'ng'iroqlar
-  answered: number; // shundan javob berilgani
   deals: number; // qo'ng'iroqlardan chiqqan sotuvlar
 }
 

@@ -47,7 +47,7 @@ marta kiritsangiz, yangi yozuv qo'shilmaydi — eskisi yangilanadi.
 | Reklama | sana, platforma, kampaniya, xarajat, ko'rsatishlar, kliklar, lidlar |
 | Video | sana, platforma, ko'rishlar, obunachilar (kun oxiriga), ko'rish soatlari, likelar |
 | Sotuv | sana, kanal, lidlar, bitimlar, daromad |
-| Kiruvchi operator | sana, kanal, qo'ng'iroqlar, javob berilgan, sotuvlar |
+| Kiruvchi operator | sana, kanal, qo'ng'iroqlar, sotuvlar |
 | Chiquvchi operator | sana, lidlar, bitimlar |
 | Klinikalar katalogi | sana, katalog (Clinics.uz / Med24), lidlar, bitimlar, daromad, xarajat |
 
@@ -75,17 +75,14 @@ Sof foyda  = daromad − reklama xarajati
 Klinikalar ROAS = daromad / xarajat
 Klinikalar CPL  = xarajat / lidlar
 
-Javob berish darajasi = javob berilgan / qo'ng'iroqlar
-O'tkazib yuborilgan   = qo'ng'iroqlar − javob berilgan
-Kiruvchidan sotuv %   = sotuvlar / javob berilgan
+Kiruvchidan sotuv %   = sotuvlar / qo'ng'iroqlar
 Chiquvchi konversiya  = bitimlar / lidlar
 ```
 
 **Operatorlar bo'limi.** _Kiruvchi_ — asosiy raqamga kelgan qo'ng'iroqlar, kanal
-kesimida. O'tkazib yuborilgan qo'ng'iroq alohida kiritilmaydi, jami va javob
-berilgan orasidagi farqdan chiqadi. _Chiquvchi_ — operatorlar qilgan
-qo'ng'iroqlarning natijasi, kunlik jami. Ikkalasi Umumiy ko'rinish sahifasining
-oxirida alohida bo'lim bo'lib chiqadi.
+kesimida (jami qo'ng'iroq va shundan chiqqan sotuv). _Chiquvchi_ — operatorlar
+qilgan qo'ng'iroqlarning natijasi, kunlik jami. Ikkalasi Umumiy ko'rinish
+sahifasining oxirida alohida bo'lim bo'lib chiqadi.
 
 **Klinikalar katalogi** (Reklama guruhi ichida). Clinics.uz va Med24 kabi
 klinika kataloglaridan kelgan lidlar qo'lda kiritiladi. Sahifada "Barchasi /

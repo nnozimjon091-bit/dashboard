@@ -109,12 +109,6 @@ export default function OverviewPage() {
     .filter((row) => row.value > 0)
     .sort((a, b) => b.value - a.value);
 
-  // O'tkazib yuborilgan qo'ng'iroq qo'lda kiritilmaydi — farqdan chiqadi.
-  const callsSeries = buildSeries(current.inbound, range, bucket, {
-    answered: (row) => row.answered,
-    missed: (row) => Math.max(0, row.calls - row.answered),
-  });
-
   const callsBySource = SALES_SOURCES.map((source) => ({
     label: source.label,
     value: sum(
@@ -404,22 +398,10 @@ export default function OverviewPage() {
                 delta={delta(kpi.inbound.calls, prev.inbound.calls)}
               />
               <StatTile
-                label="Javob berish darajasi"
-                value={pct(kpi.inbound.answerRate)}
-                delta={delta(kpi.inbound.answerRate, prev.inbound.answerRate)}
-                hint={`${num(kpi.inbound.answered)} ta javob berilgan`}
-              />
-              <StatTile
-                label="O'tkazib yuborilgan"
-                value={num(kpi.inbound.missed)}
-                delta={delta(kpi.inbound.missed, prev.inbound.missed)}
-                goodWhen="down"
-              />
-              <StatTile
                 label="Kiruvchidan sotuv"
                 value={num(kpi.inbound.deals)}
                 delta={delta(kpi.inbound.deals, prev.inbound.deals)}
-                hint={`javob berilganning ${pct(kpi.inbound.dealRate)}`}
+                hint={`qo'ng'iroqlarning ${pct(kpi.inbound.conversion)}`}
               />
               <StatTile
                 label="Chiquvchi lidlar"
@@ -434,55 +416,7 @@ export default function OverviewPage() {
               />
             </div>
 
-            <div className="mt-4 grid gap-4 xl:grid-cols-2">
-              <ChartCard<SeriesPoint>
-                title="Kiruvchi qo'ng'iroqlar"
-                subtitle="javob berilgan va o'tkazib yuborilgan"
-                legend={[
-                  { name: "Javob berilgan", color: color("calls", "answered") },
-                  {
-                    name: "O'tkazib yuborilgan",
-                    color: color("calls", "missed"),
-                  },
-                ]}
-                table={{
-                  rows: callsSeries,
-                  rowKey: (row) => String(row.key),
-                  columns: [
-                    { key: "label", label: "Davr", render: (row) => row.label },
-                    {
-                      key: "answered",
-                      label: "Javob berilgan",
-                      align: "right",
-                      render: (row) => num(Number(row.answered)),
-                    },
-                    {
-                      key: "missed",
-                      label: "O'tkazib yuborilgan",
-                      align: "right",
-                      render: (row) => num(Number(row.missed)),
-                    },
-                  ],
-                }}
-              >
-                <ColumnChart
-                  data={callsSeries}
-                  format={(value) => num(value)}
-                  series={[
-                    {
-                      key: "answered",
-                      name: "Javob berilgan",
-                      color: color("calls", "answered"),
-                    },
-                    {
-                      key: "missed",
-                      name: "O'tkazib yuborilgan",
-                      color: color("calls", "missed"),
-                    },
-                  ]}
-                />
-              </ChartCard>
-
+            <div className="mt-4">
               <ChartCard<{ label: string; value: number }>
                 title="Kanallar bo'yicha qo'ng'iroqlar"
                 subtitle="tanlangan davrdagi jami"
