@@ -34,7 +34,6 @@ const countRows = (data: DashboardData): number =>
   data.ads.length +
   data.video.length +
   data.sales.length +
-  data.inbound.length +
   data.outbound.length +
   data.catalogs.length;
 

@@ -74,7 +74,6 @@ export function parseImported(text: string): ImportResult {
     "ads",
     "video",
     "sales",
-    "inbound",
     "outbound",
     "catalogs",
   ];
@@ -92,7 +91,6 @@ export function parseImported(text: string): ImportResult {
       ads: Array.isArray(source.ads) ? source.ads : [],
       video: Array.isArray(source.video) ? source.video : [],
       sales: Array.isArray(source.sales) ? source.sales : [],
-      inbound: Array.isArray(source.inbound) ? source.inbound : [],
       outbound: Array.isArray(source.outbound) ? source.outbound : [],
       catalogs: Array.isArray(source.catalogs) ? source.catalogs : [],
     } as DashboardData,

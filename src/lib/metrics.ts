@@ -4,7 +4,6 @@ import type {
   AdEntry,
   CatalogEntry,
   DashboardData,
-  InboundEntry,
   OutboundEntry,
   SalesEntry,
   SocialEntry,
@@ -67,7 +66,6 @@ export function allDates(data: DashboardData): string[] {
     ...data.ads.map((r) => r.date),
     ...data.video.map((r) => r.date),
     ...data.sales.map((r) => r.date),
-    ...data.inbound.map((r) => r.date),
     ...data.outbound.map((r) => r.date),
     ...data.catalogs.map((r) => r.date),
   ];
@@ -115,7 +113,6 @@ export function sliceData(data: DashboardData, range: Range): DashboardData {
     ads: filterRange(data.ads, range),
     video: filterRange(data.video, range),
     sales: filterRange(data.sales, range),
-    inbound: filterRange(data.inbound, range),
     outbound: filterRange(data.outbound, range),
     catalogs: filterRange(data.catalogs, range),
   };
@@ -396,22 +393,6 @@ export function salesKpis(rows: SalesEntry[]): SalesKpis {
   };
 }
 
-export interface InboundKpis {
-  calls: number;
-  deals: number;
-  conversion: number;
-}
-
-export function inboundKpis(rows: InboundEntry[]): InboundKpis {
-  const calls = sum(rows, (r) => r.calls);
-  const deals = sum(rows, (r) => r.deals);
-  return {
-    calls,
-    deals,
-    conversion: safeDiv(deals, calls),
-  };
-}
-
 export interface OutboundKpis {
   leads: number;
   deals: number;
@@ -457,7 +438,6 @@ export interface OverviewKpis {
   social: SocialKpis;
   video: VideoKpis;
   sales: SalesKpis;
-  inbound: InboundKpis;
   outbound: OutboundKpis;
   catalogs: CatalogKpis;
   /** Reklama xarajati + Klinikalar katalogi xarajati. */
@@ -504,7 +484,6 @@ export function overviewKpis(data: DashboardData): OverviewKpis {
     social: socialKpis(data.social),
     video: videoKpis(data.video),
     sales,
-    inbound: inboundKpis(data.inbound),
     outbound,
     catalogs,
     totalSpend,

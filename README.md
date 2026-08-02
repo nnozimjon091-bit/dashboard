@@ -47,7 +47,6 @@ marta kiritsangiz, yangi yozuv qo'shilmaydi — eskisi yangilanadi.
 | Reklama | sana, platforma, kampaniya, xarajat, ko'rsatishlar, kliklar, lidlar (Meta Ads uchun qo'shimcha: lead yo'nalishi) |
 | Video | sana, platforma, videolar soni, shorts soni, ko'rishlar, obunachilar (kun oxiriga), ko'rish soatlari, likelar |
 | Sotuv | sana, kanal, lidlar, bitimlar, daromad |
-| Kiruvchi operator | sana, kanal, qo'ng'iroqlar, sotuvlar |
 | Chiquvchi operator | sana, lead yo'nalishi, lidlar, bitimlar, daromad |
 | Klinikalar katalogi | sana, katalog (Clinics.uz / Med24), lidlar, bitimlar, daromad, xarajat |
 
@@ -75,22 +74,18 @@ Sof foyda  = daromad − reklama xarajati
 Klinikalar ROAS = daromad / xarajat
 Klinikalar CPL  = xarajat / lidlar
 
-Kiruvchidan sotuv %   = sotuvlar / qo'ng'iroqlar
 Chiquvchi konversiya  = bitimlar / lidlar
 
 ROMI (yo'nalish) = chiquvchi operator daromadi / Meta Ads xarajati (shu yo'nalish)
 ```
 
-**Operatorlar bo'limi.** _Kiruvchi_ — asosiy raqamga kelgan qo'ng'iroqlar, kanal
-kesimida (jami qo'ng'iroq va shundan chiqqan sotuv); Umumiy ko'rinishda faqat
-umumiy (yo'nalishsiz) jami sifatida, sahifaning oxirida alohida bo'lim bo'lib
-chiqadi — daromadga qo'shilmaydi (daromad maydoni yo'q). _Chiquvchi_ —
-operatorlar qilgan qo'ng'iroqlarning natijasi, lead yo'nalishi (Urolog,
-Dermatolog va h.k.) kesimida, daromad bilan; yo'nalish bo'yicha hisobot
-_Sotuv va lidlar_ sahifasida chiqadi, lidlari/bitimlari/daromadi esa Umumiy
-ko'rinishning **Umumiy lidlar / bitimlar / daromad** jamiga ham qo'shiladi
-(Klinikalar katalogi kabi) — faqat xarajat tomoni yo'q, chunki bu lidlarning
-Meta Ads xarajati reklama xarajatida allaqachon hisobga olingan.
+**Chiquvchi operator bo'limi.** Operatorlar qilgan chiquvchi qo'ng'iroqlarning
+natijasi, lead yo'nalishi (Urolog, Dermatolog va h.k.) kesimida, daromad bilan;
+yo'nalish bo'yicha hisobot _Sotuv va lidlar_ sahifasida chiqadi, lidlari/
+bitimlari/daromadi esa Umumiy ko'rinishning **Umumiy lidlar / bitimlar /
+daromad** jamiga ham qo'shiladi (Klinikalar katalogi kabi) — faqat xarajat
+tomoni yo'q, chunki bu lidlarning Meta Ads xarajati reklama xarajatida
+allaqachon hisobga olingan.
 
 **Meta Ads → Chiquvchi operator bog'lanishi.** Meta Ads kampaniyasi kiritilganda
 lead yo'nalishi (Urolog, Dermatolog va h.k.) tanlanadi — bu xuddi Chiquvchi

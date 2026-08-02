@@ -119,16 +119,6 @@ export default function OverviewPage() {
     .filter((row) => row.value > 0)
     .sort((a, b) => b.value - a.value);
 
-  const callsBySource = SALES_SOURCES.map((source) => ({
-    label: source.label,
-    value: sum(
-      current.inbound.filter((row) => row.source === source.value),
-      (row) => row.calls,
-    ),
-  }))
-    .filter((row) => row.value > 0)
-    .sort((a, b) => b.value - a.value);
-
   const totalAudience = kpi.social.followers + kpi.video.subscribers;
   const prevAudience = prev.social.followers + prev.video.subscribers;
 
@@ -425,21 +415,10 @@ export default function OverviewPage() {
 
           <section>
             <SectionTitle
-              title="Operatorlar"
-              hint="Asosiy raqamga kelgan va operatorlar qilgan qo'ng'iroqlar"
+              title="Chiquvchi operator"
+              hint="Operatorlar qilgan chiquvchi qo'ng'iroqlar natijasi"
             />
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <StatTile
-                label="Kiruvchi qo'ng'iroqlar"
-                value={num(kpi.inbound.calls)}
-                delta={delta(kpi.inbound.calls, prev.inbound.calls)}
-              />
-              <StatTile
-                label="Kiruvchidan sotuv"
-                value={num(kpi.inbound.deals)}
-                delta={delta(kpi.inbound.deals, prev.inbound.deals)}
-                hint={`qo'ng'iroqlarning ${pct(kpi.inbound.conversion)}`}
-              />
               <StatTile
                 label="Chiquvchi lidlar"
                 value={num(kpi.outbound.leads)}
@@ -451,31 +430,6 @@ export default function OverviewPage() {
                 delta={delta(kpi.outbound.deals, prev.outbound.deals)}
                 hint={`konversiya ${pct(kpi.outbound.conversion)}`}
               />
-            </div>
-
-            <div className="mt-4">
-              <ChartCard<{ label: string; value: number }>
-                title="Kanallar bo'yicha qo'ng'iroqlar"
-                subtitle="tanlangan davrdagi jami"
-                table={{
-                  rows: callsBySource,
-                  rowKey: (row) => row.label,
-                  columns: [
-                    { key: "label", label: "Kanal", render: (row) => row.label },
-                    {
-                      key: "value",
-                      label: "Qo'ng'iroq",
-                      align: "right",
-                      render: (row) => num(row.value),
-                    },
-                  ],
-                }}
-              >
-                <CategoryBarChart
-                  data={callsBySource}
-                  format={(value) => num(value)}
-                />
-              </ChartCard>
             </div>
           </section>
         </>

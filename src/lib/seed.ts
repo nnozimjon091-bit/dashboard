@@ -7,7 +7,6 @@ import {
   type AdEntry,
   type CatalogEntry,
   type DashboardData,
-  type InboundEntry,
   type LeadDirection,
   type OutboundEntry,
   type SalesEntry,
@@ -64,7 +63,6 @@ export function buildDemoData(days = 90): DashboardData {
   const ads: AdEntry[] = [];
   const video: VideoEntry[] = [];
   const sales: SalesEntry[] = [];
-  const inbound: InboundEntry[] = [];
   const outbound: OutboundEntry[] = [];
   const catalogs: CatalogEntry[] = [];
 
@@ -177,18 +175,6 @@ export function buildDemoData(days = 90): DashboardData {
         deals,
         revenue: Number((deals * check * jitter(0.25)).toFixed(2)),
       });
-
-      // ── Kiruvchi qo'ng'iroqlar ──
-      // Har bir lid ortida bir nechta qo'ng'iroq bo'ladi.
-      const calls = Math.max(0, Math.round(leads * 1.8 * jitter(0.4)));
-      if (calls === 0) return;
-      inbound.push({
-        id: `demo-in-${order}-${date}`,
-        date,
-        source,
-        calls,
-        deals: Math.max(0, Math.round(calls * 0.14 * jitter(0.7))),
-      });
     });
 
     // ── Chiquvchi qo'ng'iroqlar ──
@@ -251,5 +237,5 @@ export function buildDemoData(days = 90): DashboardData {
     });
   }
 
-  return { social, ads, video, sales, inbound, outbound, catalogs };
+  return { social, ads, video, sales, outbound, catalogs };
 }

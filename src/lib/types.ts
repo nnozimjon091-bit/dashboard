@@ -57,15 +57,6 @@ export interface SalesEntry {
   revenue: number; // USD
 }
 
-/** Asosiy raqamga kelgan qo'ng'iroqlar — kanal kesimida, kunlik jami. */
-export interface InboundEntry {
-  id: string;
-  date: string;
-  source: SalesSource;
-  calls: number; // jami kelgan qo'ng'iroqlar
-  deals: number; // qo'ng'iroqlardan chiqqan sotuvlar
-}
-
 export type LeadDirection =
   | "urolog"
   | "dermatolog"
@@ -111,7 +102,6 @@ export interface DashboardData {
   ads: AdEntry[];
   video: VideoEntry[];
   sales: SalesEntry[];
-  inbound: InboundEntry[];
   outbound: OutboundEntry[];
   catalogs: CatalogEntry[];
 }
@@ -123,7 +113,6 @@ export const EMPTY_DATA: DashboardData = {
   ads: [],
   video: [],
   sales: [],
-  inbound: [],
   outbound: [],
   catalogs: [],
 };

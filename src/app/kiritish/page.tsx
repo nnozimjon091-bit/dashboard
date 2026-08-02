@@ -428,63 +428,6 @@ const SALES_CONFIG: DatasetConfig<"sales"> = {
   ],
 };
 
-const INBOUND_CONFIG: DatasetConfig<"inbound"> = {
-  dataset: "inbound",
-  title: "Kiruvchi qo'ng'iroqlar",
-  hint: "Asosiy raqamga kelgan qo'ng'iroqlar, kanal kesimida.",
-  fields: [
-    { name: "date", label: "Sana", type: "date" },
-    { name: "source", label: "Kanal", type: "select", options: SALES_SOURCES },
-    {
-      name: "calls",
-      label: "Qo'ng'iroqlar",
-      type: "number",
-      hint: "Shu kanaldan kelgan jami qo'ng'iroqlar",
-    },
-    {
-      name: "deals",
-      label: "Sotuvlar",
-      type: "number",
-      hint: "Shu qo'ng'iroqlardan chiqqan bitimlar",
-    },
-  ],
-  defaults: { source: "maps", calls: "", deals: "" },
-  toEntry: (values) => ({
-    date: values.date,
-    source: values.source as SalesSource,
-    calls: toNumber(values.calls),
-    deals: toNumber(values.deals),
-  }),
-  toValues: (row) => ({
-    date: row.date,
-    source: row.source,
-    calls: String(row.calls),
-    deals: String(row.deals),
-  }),
-  isSame: (row, values) =>
-    row.date === values.date && row.source === values.source,
-  columns: [
-    { key: "date", label: "Sana", render: (row) => shortDate(row.date) },
-    {
-      key: "source",
-      label: "Kanal",
-      render: (row) => labelFor(SALES_SOURCES, row.source),
-    },
-    {
-      key: "calls",
-      label: "Qo'ng'iroq",
-      align: "right",
-      render: (row) => num(row.calls),
-    },
-    {
-      key: "deals",
-      label: "Sotuv",
-      align: "right",
-      render: (row) => num(row.deals),
-    },
-  ],
-};
-
 const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
   dataset: "outbound",
   title: "Chiquvchi qo'ng'iroqlar",
@@ -673,7 +616,6 @@ const TABS = [
   { id: "ads", label: "Reklama" },
   { id: "video", label: "Video" },
   { id: "sales", label: "Sotuv" },
-  { id: "inbound", label: "Kiruvchi operator" },
   { id: "outbound", label: "Chiquvchi operator" },
   { id: "catalogs", label: "Klinikalar katalogi" },
 ] as const;
@@ -720,7 +662,6 @@ export default function EntryPage() {
       {tab === "ads" ? <EntryPanel config={ADS_CONFIG} /> : null}
       {tab === "video" ? <EntryPanel config={VIDEO_CONFIG} /> : null}
       {tab === "sales" ? <EntryPanel config={SALES_CONFIG} /> : null}
-      {tab === "inbound" ? <EntryPanel config={INBOUND_CONFIG} /> : null}
       {tab === "outbound" ? <EntryPanel config={OUTBOUND_CONFIG} /> : null}
       {tab === "catalogs" ? <EntryPanel config={CATALOG_CONFIG} /> : null}
     </div>
