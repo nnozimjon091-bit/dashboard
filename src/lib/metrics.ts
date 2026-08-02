@@ -415,13 +415,15 @@ export function inboundKpis(rows: InboundEntry[]): InboundKpis {
 export interface OutboundKpis {
   leads: number;
   deals: number;
+  revenue: number;
   conversion: number;
 }
 
 export function outboundKpis(rows: OutboundEntry[]): OutboundKpis {
   const leads = sum(rows, (r) => r.leads);
   const deals = sum(rows, (r) => r.deals);
-  return { leads, deals, conversion: safeDiv(deals, leads) };
+  const revenue = sum(rows, (r) => r.revenue);
+  return { leads, deals, revenue, conversion: safeDiv(deals, leads) };
 }
 
 export interface CatalogKpis {

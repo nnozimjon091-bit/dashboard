@@ -8,6 +8,7 @@ import {
   type CatalogEntry,
   type DashboardData,
   type InboundEntry,
+  type LeadDirection,
   type OutboundEntry,
   type SalesEntry,
   type SocialEntry,
@@ -32,12 +33,28 @@ function weekendFactor(iso: string): number {
 }
 
 /** Kunlik byudjet, USD. Jami ≈ $460/kun — ROAS 2–3x atrofida chiqadi. */
-const AD_CAMPAIGNS: { platform: AdEntry["platform"]; campaign: string; base: number }[] =
-  [
-    { platform: "meta", campaign: "Yozgi aksiya", base: 210 },
-    { platform: "google", campaign: "Brend so'rovlari", base: 140 },
-    { platform: "tiktok", campaign: "Reels trafik", base: 110 },
-  ];
+const AD_CAMPAIGNS: {
+  platform: AdEntry["platform"];
+  campaign: string;
+  base: number;
+  direction?: LeadDirection;
+}[] = [
+  { platform: "meta", campaign: "Urolog aksiyasi", base: 90, direction: "urolog" },
+  {
+    platform: "meta",
+    campaign: "Dermatolog aksiyasi",
+    base: 70,
+    direction: "dermatolog",
+  },
+  {
+    platform: "meta",
+    campaign: "Stomatolog implant aksiyasi",
+    base: 50,
+    direction: "stomatolog_implant",
+  },
+  { platform: "google", campaign: "Brend so'rovlari", base: 140 },
+  { platform: "tiktok", campaign: "Reels trafik", base: 110 },
+];
 
 export function buildDemoData(days = 90): DashboardData {
   const random = mulberry32(20260730);
@@ -103,6 +120,7 @@ export function buildDemoData(days = 90): DashboardData {
         date,
         platform: campaign.platform,
         campaign: campaign.campaign,
+        direction: campaign.direction,
         spend,
         impressions,
         clicks,
@@ -175,27 +193,33 @@ export function buildDemoData(days = 90): DashboardData {
 
     // ── Chiquvchi qo'ng'iroqlar ──
     const outLeadsTotal = Math.max(0, Math.round(18 * weekend * jitter(0.6)));
-    const outboundMix: { direction: OutboundEntry["direction"]; share: number }[] = [
-      { direction: "urolog", share: 0.22 },
-      { direction: "dermatolog", share: 0.18 },
-      { direction: "stomatolog_implant", share: 0.16 },
-      { direction: "uzd", share: 0.14 },
-      { direction: "kardiolog_chekup", share: 0.12 },
-      { direction: "ortoped", share: 0.1 },
-      { direction: "oftalmolog", share: 0.08 },
+    const outboundMix: {
+      direction: OutboundEntry["direction"];
+      share: number;
+      check: number;
+    }[] = [
+      { direction: "urolog", share: 0.22, check: 220 },
+      { direction: "dermatolog", share: 0.18, check: 180 },
+      { direction: "stomatolog_implant", share: 0.16, check: 450 },
+      { direction: "uzd", share: 0.14, check: 90 },
+      { direction: "kardiolog_chekup", share: 0.12, check: 150 },
+      { direction: "ortoped", share: 0.1, check: 260 },
+      { direction: "oftalmolog", share: 0.08, check: 200 },
     ];
-    outboundMix.forEach(({ direction, share }, order) => {
+    outboundMix.forEach(({ direction, share, check }, order) => {
       const outLeads = Math.max(
         0,
         Math.round(outLeadsTotal * share * jitter(0.6)),
       );
       if (outLeads === 0) return;
+      const outDeals = Math.max(0, Math.round(outLeads * 0.19 * jitter(0.8)));
       outbound.push({
         id: `demo-out-${order}-${date}`,
         date,
         direction,
         leads: outLeads,
-        deals: Math.max(0, Math.round(outLeads * 0.19 * jitter(0.8))),
+        deals: outDeals,
+        revenue: Number((outDeals * check * jitter(0.25)).toFixed(2)),
       });
     });
 

@@ -26,7 +26,7 @@ npm run start
 |---|---|
 | **Umumiy ko'rinish** | Daromad, xarajat, ROAS, CAC, lidlar, konversiya, auditoriya o'sishi, tagida operatorlar bo'limi |
 | **Ijtimoiy tarmoq** | Instagram va Telegram: obunachilar, qamrov, faollik (ER); Instagram Story alohida kartochkada |
-| **Reklama** | To'rt bo'lim: Umumiy, Meta Ads, Google Ads, Klinikalar katalogi |
+| **Reklama** | To'rt bo'lim: Umumiy, Meta Ads, Google Ads, Klinikalar katalogi; Meta Ads'da lead yo'nalishi bo'yicha ROMI |
 | **Video** | YouTube va TikTok: ko'rishlar, obunachilar, ko'rish soatlari; YouTube uchun alohida bo'lim (videolar, shorts, yangi obunachilar) |
 | **Sotuv va lidlar** | Lid → bitim yo'li, kanallarning daromadga hissasi, chiquvchi lidlarning yo'nalish kesimi |
 | **Ma'lumot kiritish** | Kunlik ko'rsatkichlarni qo'shish va tahrirlash |
@@ -44,11 +44,11 @@ marta kiritsangiz, yangi yozuv qo'shilmaydi — eskisi yangilanadi.
 | Bo'lim | Maydonlar |
 |---|---|
 | Ijtimoiy tarmoq | sana, platforma (Instagram / Telegram / Instagram Story), obunachilar (kun oxiriga), qamrov, faollik, postlar |
-| Reklama | sana, platforma, kampaniya, xarajat, ko'rsatishlar, kliklar, lidlar |
+| Reklama | sana, platforma, kampaniya, xarajat, ko'rsatishlar, kliklar, lidlar (Meta Ads uchun qo'shimcha: lead yo'nalishi) |
 | Video | sana, platforma, videolar soni, shorts soni, ko'rishlar, obunachilar (kun oxiriga), ko'rish soatlari, likelar |
 | Sotuv | sana, kanal, lidlar, bitimlar, daromad |
 | Kiruvchi operator | sana, kanal, qo'ng'iroqlar, sotuvlar |
-| Chiquvchi operator | sana, lead yo'nalishi, lidlar, bitimlar |
+| Chiquvchi operator | sana, lead yo'nalishi, lidlar, bitimlar, daromad |
 | Klinikalar katalogi | sana, katalog (Clinics.uz / Med24), lidlar, bitimlar, daromad, xarajat |
 
 **Muhim:** _Reklama_ bo'limidagi lid — faqat pullik reklamadan kelgan murojaat
@@ -77,14 +77,23 @@ Klinikalar CPL  = xarajat / lidlar
 
 Kiruvchidan sotuv %   = sotuvlar / qo'ng'iroqlar
 Chiquvchi konversiya  = bitimlar / lidlar
+
+ROMI (yo'nalish) = chiquvchi operator daromadi / Meta Ads xarajati (shu yo'nalish)
 ```
 
 **Operatorlar bo'limi.** _Kiruvchi_ — asosiy raqamga kelgan qo'ng'iroqlar, kanal
 kesimida (jami qo'ng'iroq va shundan chiqqan sotuv). _Chiquvchi_ — operatorlar
 qilgan qo'ng'iroqlarning natijasi, lead yo'nalishi (Urolog, Dermatolog va h.k.)
-kesimida; yo'nalish bo'yicha hisobot _Sotuv va lidlar_ sahifasida chiqadi,
-Umumiy ko'rinishda esa ikkalasi ham umumiy (yo'nalishsiz) jami sifatida,
-sahifaning oxirida alohida bo'lim bo'lib chiqadi.
+kesimida, endi daromad bilan; yo'nalish bo'yicha hisobot _Sotuv va lidlar_
+sahifasida chiqadi, Umumiy ko'rinishda esa ikkalasi ham umumiy (yo'nalishsiz)
+jami sifatida, sahifaning oxirida alohida bo'lim bo'lib chiqadi.
+
+**Meta Ads → Chiquvchi operator bog'lanishi.** Meta Ads kampaniyasi kiritilganda
+lead yo'nalishi (Urolog, Dermatolog va h.k.) tanlanadi — bu xuddi Chiquvchi
+operator formasidagi yo'nalish ro'yxati bilan bir xil. Meta Ads sahifasida shu
+yo'nalish bo'yicha ROMI hisoblanadi: chiquvchi operatorlar shu yo'nalishdagi
+lidlar bilan gaplashib yopgan daromad ÷ shu yo'nalishga sarflangan Meta Ads
+xarajati.
 
 **Klinikalar katalogi** (Reklama guruhi ichida). Clinics.uz va Med24 kabi
 klinika kataloglaridan kelgan lidlar qo'lda kiritiladi. Sahifada "Barchasi /

@@ -140,6 +140,13 @@ const ADS_CONFIG: DatasetConfig<"ads"> = {
       options: ADS_PLATFORMS,
     },
     {
+      name: "direction",
+      label: "Lead yo'nalishi",
+      type: "select",
+      options: LEAD_DIRECTIONS,
+      showIf: (v) => v.platform === "meta",
+    },
+    {
       name: "campaign",
       label: "Kampaniya nomi",
       type: "text",
@@ -163,6 +170,7 @@ const ADS_CONFIG: DatasetConfig<"ads"> = {
   ],
   defaults: {
     platform: "meta",
+    direction: "urolog",
     campaign: "",
     spend: "",
     impressions: "",
@@ -172,6 +180,10 @@ const ADS_CONFIG: DatasetConfig<"ads"> = {
   toEntry: (values) => ({
     date: values.date,
     platform: values.platform as AdsPlatform,
+    direction:
+      values.platform === "meta"
+        ? (values.direction as LeadDirection)
+        : undefined,
     campaign: values.campaign.trim() || "Nomsiz kampaniya",
     spend: toNumber(values.spend),
     impressions: toNumber(values.impressions),
@@ -181,6 +193,7 @@ const ADS_CONFIG: DatasetConfig<"ads"> = {
   toValues: (row) => ({
     date: row.date,
     platform: row.platform,
+    direction: row.direction ?? "",
     campaign: row.campaign,
     spend: String(row.spend),
     impressions: String(row.impressions),
@@ -199,6 +212,12 @@ const ADS_CONFIG: DatasetConfig<"ads"> = {
       key: "platform",
       label: "Platforma",
       render: (row) => labelFor(ADS_PLATFORMS, row.platform),
+    },
+    {
+      key: "direction",
+      label: "Yo'nalish",
+      render: (row) =>
+        row.direction ? labelFor(LEAD_DIRECTIONS, row.direction) : "—",
     },
     {
       key: "spend",
@@ -490,19 +509,28 @@ const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
       type: "number",
       hint: "Yopilgan sotuvlar",
     },
+    {
+      name: "revenue",
+      label: "Daromad (USD)",
+      type: "number",
+      step: "0.01",
+      hint: "Shu yo'nalishdagi bitimlardan tushgan daromad",
+    },
   ],
-  defaults: { direction: "urolog", leads: "", deals: "" },
+  defaults: { direction: "urolog", leads: "", deals: "", revenue: "" },
   toEntry: (values) => ({
     date: values.date,
     direction: values.direction as LeadDirection,
     leads: toNumber(values.leads),
     deals: toNumber(values.deals),
+    revenue: toNumber(values.revenue),
   }),
   toValues: (row) => ({
     date: row.date,
     direction: row.direction,
     leads: String(row.leads),
     deals: String(row.deals),
+    revenue: String(row.revenue),
   }),
   isSame: (row, values) =>
     row.date === values.date && row.direction === values.direction,
@@ -530,6 +558,12 @@ const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
       label: "Konversiya",
       align: "right",
       render: (row) => pct(safeDiv(row.deals, row.leads)),
+    },
+    {
+      key: "revenue",
+      label: "Daromad",
+      align: "right",
+      render: (row) => usd(row.revenue, 2),
     },
   ],
 };

@@ -32,6 +32,8 @@ export interface AdEntry {
   impressions: number;
   clicks: number;
   leads: number;
+  /** Faqat Meta Ads uchun: shu kampaniya qaysi lead yo'nalishiga ishlagan. */
+  direction?: LeadDirection;
 }
 
 export interface VideoEntry {
@@ -83,6 +85,7 @@ export interface OutboundEntry {
   direction: LeadDirection;
   leads: number;
   deals: number;
+  revenue: number; // USD — shu yo'nalishdagi bitimlardan tushgan daromad
 }
 
 export type CatalogSource = "clinics_uz" | "med24";

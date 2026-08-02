@@ -7,17 +7,19 @@ import { CategoryBarChart, ColumnChart, TrendChart } from "@/components/charts";
 import { NoData, NoDataInRange } from "@/components/no-data";
 import { StatTile } from "@/components/stat-tile";
 import { Card, DataTable, PageHeader, SectionTitle } from "@/components/ui";
-import { compact, num, pct, usd, usdCompact, usdFine } from "@/lib/format";
+import { compact, num, pct, ratio, usd, usdCompact, usdFine } from "@/lib/format";
 import {
   adsKpis,
   buildSeries,
   delta,
+  outboundKpis,
   safeDiv,
   type SeriesPoint,
 } from "@/lib/metrics";
 import {
   ADS_PLATFORMS,
   labelFor,
+  LEAD_DIRECTIONS,
   type AdEntry,
   type AdsPlatform,
 } from "@/lib/types";
@@ -113,6 +115,42 @@ export function AdsView({
     .sort((a, b) => b.value - a.value);
 
   const campaigns = groupByCampaign(ads);
+
+  // Meta Ads'da lead yo'nalishi (Urolog, Dermatolog va h.k.) bo'yicha
+  // chiquvchi operator ROMI hisobi — faqat Meta sahifasida ko'rinadi.
+  const romiByDirection =
+    platform === "meta"
+      ? LEAD_DIRECTIONS.map((direction) => {
+          const metaRows = ads.filter(
+            (row) => row.direction === direction.value,
+          );
+          const metaSpend = metaRows.reduce(
+            (total, row) => total + row.spend,
+            0,
+          );
+          const metaLeads = metaRows.reduce(
+            (total, row) => total + row.leads,
+            0,
+          );
+          const out = outboundKpis(
+            current.outbound.filter(
+              (row) => row.direction === direction.value,
+            ),
+          );
+          return {
+            direction: direction.label,
+            metaSpend,
+            metaLeads,
+            outboundDeals: out.deals,
+            outboundRevenue: out.revenue,
+            romi: safeDiv(out.revenue, metaSpend),
+          };
+        }).filter((row) => row.metaSpend > 0 || row.outboundDeals > 0)
+      : [];
+
+  const romiChart = romiByDirection
+    .map((row) => ({ label: row.direction, value: row.romi }))
+    .sort((a, b) => b.value - a.value);
 
   if (isEmpty) {
     return (
@@ -298,6 +336,35 @@ export function AdsView({
               />
             </ChartCard>
             )}
+
+            {platform === "meta" ? (
+            <ChartCard<{ label: string; value: number }>
+              title="ROMI — yo'nalish bo'yicha"
+              subtitle="chiquvchi operator daromadi / Meta xarajat"
+              table={{
+                rows: romiChart,
+                rowKey: (row) => row.label,
+                columns: [
+                  {
+                    key: "label",
+                    label: "Yo'nalish",
+                    render: (row) => row.label,
+                  },
+                  {
+                    key: "value",
+                    label: "ROMI",
+                    align: "right",
+                    render: (row) => ratio(row.value),
+                  },
+                ],
+              }}
+            >
+              <CategoryBarChart
+                data={romiChart}
+                format={(value) => ratio(value)}
+              />
+            </ChartCard>
+            ) : null}
           </div>
 
           <Card>
@@ -358,6 +425,56 @@ export function AdsView({
               ]}
             />
           </Card>
+
+          {platform === "meta" ? (
+          <Card>
+            <SectionTitle
+              title="Yo'nalish bo'yicha ROMI — batafsil"
+              hint="Meta xarajat va chiquvchi operator natijasi"
+            />
+            <DataTable
+              rows={romiByDirection}
+              rowKey={(row) => row.direction}
+              columns={[
+                {
+                  key: "direction",
+                  label: "Yo'nalish",
+                  render: (row) => row.direction,
+                },
+                {
+                  key: "metaSpend",
+                  label: "Meta xarajat",
+                  align: "right",
+                  render: (row) => usd(row.metaSpend, 2),
+                },
+                {
+                  key: "metaLeads",
+                  label: "Meta lid",
+                  align: "right",
+                  render: (row) => num(row.metaLeads),
+                },
+                {
+                  key: "outboundDeals",
+                  label: "Bitim",
+                  align: "right",
+                  render: (row) => num(row.outboundDeals),
+                },
+                {
+                  key: "outboundRevenue",
+                  label: "Daromad",
+                  align: "right",
+                  render: (row) => usd(row.outboundRevenue, 2),
+                },
+                {
+                  key: "romi",
+                  label: "ROMI",
+                  align: "right",
+                  render: (row) => ratio(row.romi),
+                },
+              ]}
+            />
+          </Card>
+          ) : null}
         </>
       )}
     </div>
