@@ -482,16 +482,21 @@ export function overviewKpis(data: DashboardData): OverviewKpis {
   const ads = adsKpis(data.ads);
   const sales = salesKpis(data.sales);
   const catalogs = catalogKpis(data.catalogs);
+  const outbound = outboundKpis(data.outbound);
 
   // Klinikalar katalogi ham pullik lid manbai (Reklama kabi), ham sotuv
   // natijasi (daromad/bitim) beradi — shuning uchun ikkala tomonga ham
   // qo'shiladi: xarajat reklama xarajatiga, daromad/lid/bitim esa sotuv
   // ko'rsatkichlariga. Aks holda xarajat oshadi-yu, unga mos daromad
   // hisobga kirmay, ROAS va Sof foyda noto'g'ri chiqadi.
+  //
+  // Chiquvchi operator ham xuddi shunday sotuv natijasi (lid/bitim/daromad)
+  // beradi, faqat xarajat tomoni yo'q — Meta Ads xarajati reklama xarajatida
+  // allaqachon hisobga olingan, bu yerda faqat uning daromad tomoni qo'shiladi.
   const totalSpend = ads.spend + catalogs.spend;
-  const totalRevenue = sales.revenue + catalogs.revenue;
-  const totalLeads = sales.leads + catalogs.leads;
-  const totalDeals = sales.deals + catalogs.deals;
+  const totalRevenue = sales.revenue + catalogs.revenue + outbound.revenue;
+  const totalLeads = sales.leads + catalogs.leads + outbound.leads;
+  const totalDeals = sales.deals + catalogs.deals + outbound.deals;
   const paidLeads = ads.leads + catalogs.leads;
 
   return {
@@ -500,7 +505,7 @@ export function overviewKpis(data: DashboardData): OverviewKpis {
     video: videoKpis(data.video),
     sales,
     inbound: inboundKpis(data.inbound),
-    outbound: outboundKpis(data.outbound),
+    outbound,
     catalogs,
     totalSpend,
     totalRevenue,

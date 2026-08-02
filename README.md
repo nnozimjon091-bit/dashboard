@@ -82,11 +82,15 @@ ROMI (yo'nalish) = chiquvchi operator daromadi / Meta Ads xarajati (shu yo'nalis
 ```
 
 **Operatorlar bo'limi.** _Kiruvchi_ — asosiy raqamga kelgan qo'ng'iroqlar, kanal
-kesimida (jami qo'ng'iroq va shundan chiqqan sotuv). _Chiquvchi_ — operatorlar
-qilgan qo'ng'iroqlarning natijasi, lead yo'nalishi (Urolog, Dermatolog va h.k.)
-kesimida, endi daromad bilan; yo'nalish bo'yicha hisobot _Sotuv va lidlar_
-sahifasida chiqadi, Umumiy ko'rinishda esa ikkalasi ham umumiy (yo'nalishsiz)
-jami sifatida, sahifaning oxirida alohida bo'lim bo'lib chiqadi.
+kesimida (jami qo'ng'iroq va shundan chiqqan sotuv); Umumiy ko'rinishda faqat
+umumiy (yo'nalishsiz) jami sifatida, sahifaning oxirida alohida bo'lim bo'lib
+chiqadi — daromadga qo'shilmaydi (daromad maydoni yo'q). _Chiquvchi_ —
+operatorlar qilgan qo'ng'iroqlarning natijasi, lead yo'nalishi (Urolog,
+Dermatolog va h.k.) kesimida, daromad bilan; yo'nalish bo'yicha hisobot
+_Sotuv va lidlar_ sahifasida chiqadi, lidlari/bitimlari/daromadi esa Umumiy
+ko'rinishning **Umumiy lidlar / bitimlar / daromad** jamiga ham qo'shiladi
+(Klinikalar katalogi kabi) — faqat xarajat tomoni yo'q, chunki bu lidlarning
+Meta Ads xarajati reklama xarajatida allaqachon hisobga olingan.
 
 **Meta Ads → Chiquvchi operator bog'lanishi.** Meta Ads kampaniyasi kiritilganda
 lead yo'nalishi (Urolog, Dermatolog va h.k.) tanlanadi — bu xuddi Chiquvchi
