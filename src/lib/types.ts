@@ -56,7 +56,8 @@ export interface SalesEntry {
 export interface InboundEntry {
   id: string;
   date: string;
-  source: SalesSource;
+  /** Ro'yxatdan tanlangan (kanonik kod) yoki qo'lda yozilgan erkin nom. */
+  source: string;
   calls: number; // jami kelgan qo'ng'iroqlar
   answered: number; // shundan javob berilgani
   deals: number; // qo'ng'iroqlardan chiqqan sotuvlar
@@ -148,6 +149,24 @@ export const CATALOG_SOURCES: { value: CatalogSource; label: string }[] = [
  * "Xarajat" maydoni bo'sh qoldirilsa, shu qiymatdan avtomatik hisoblanadi.
  */
 export const MED24_COST_PER_LEAD = 1;
+
+/**
+ * Erkin yozilgan matnni ro'yxatdagi kanonik qiymatga moslaydi (masalan
+ * "Instagram" → "instagram"), shunda eski yozuvlar bilan guruhlash buzilmaydi.
+ * Mos kelmasa, yozilgan matnning o'zi qaytadi.
+ */
+export function normalizeToKnown(
+  list: { value: string; label: string }[],
+  raw: string,
+): string {
+  const trimmed = raw.trim();
+  const match = list.find(
+    (item) =>
+      item.value.toLowerCase() === trimmed.toLowerCase() ||
+      item.label.toLowerCase() === trimmed.toLowerCase(),
+  );
+  return match ? match.value : trimmed;
+}
 
 export function labelFor(
   list: { value: string; label: string }[],

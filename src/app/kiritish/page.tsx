@@ -14,6 +14,7 @@ import {
   CATALOG_SOURCES,
   labelFor,
   MED24_COST_PER_LEAD,
+  normalizeToKnown,
   SALES_SOURCES,
   SOCIAL_PLATFORMS,
   VIDEO_PLATFORMS,
@@ -368,7 +369,13 @@ const INBOUND_CONFIG: DatasetConfig<"inbound"> = {
   hint: "Asosiy raqamga kelgan qo'ng'iroqlar, kanal kesimida.",
   fields: [
     { name: "date", label: "Sana", type: "date" },
-    { name: "source", label: "Kanal", type: "select", options: SALES_SOURCES },
+    {
+      name: "source",
+      label: "Kanal",
+      type: "text",
+      placeholder: "Instagram",
+      suggestions: SALES_SOURCES,
+    },
     {
       name: "calls",
       label: "Qo'ng'iroqlar",
@@ -388,23 +395,24 @@ const INBOUND_CONFIG: DatasetConfig<"inbound"> = {
       hint: "Shu qo'ng'iroqlardan chiqqan bitimlar",
     },
   ],
-  defaults: { source: "instagram", calls: "", answered: "", deals: "" },
+  defaults: { source: "Instagram", calls: "", answered: "", deals: "" },
   toEntry: (values) => ({
     date: values.date,
-    source: values.source as SalesSource,
+    source: normalizeToKnown(SALES_SOURCES, values.source) || "Boshqa",
     calls: toNumber(values.calls),
     answered: toNumber(values.answered),
     deals: toNumber(values.deals),
   }),
   toValues: (row) => ({
     date: row.date,
-    source: row.source,
+    source: labelFor(SALES_SOURCES, row.source),
     calls: String(row.calls),
     answered: String(row.answered),
     deals: String(row.deals),
   }),
   isSame: (row, values) =>
-    row.date === values.date && row.source === values.source,
+    row.date === values.date &&
+    row.source === normalizeToKnown(SALES_SOURCES, values.source),
   columns: [
     { key: "date", label: "Sana", render: (row) => shortDate(row.date) },
     {
