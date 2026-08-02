@@ -19,14 +19,28 @@ import { useStore } from "@/lib/store";
 import type { DashboardData, DatasetKey } from "@/lib/types";
 
 export type FieldSpec =
-  | { name: string; label: string; type: "date" }
-  | { name: string; label: string; type: "text"; placeholder?: string }
-  | { name: string; label: string; type: "number"; step?: string; hint?: string }
+  | { name: string; label: string; type: "date"; showIf?: (values: Values) => boolean }
+  | {
+      name: string;
+      label: string;
+      type: "text";
+      placeholder?: string;
+      showIf?: (values: Values) => boolean;
+    }
+  | {
+      name: string;
+      label: string;
+      type: "number";
+      step?: string;
+      hint?: string;
+      showIf?: (values: Values) => boolean;
+    }
   | {
       name: string;
       label: string;
       type: "select";
       options: { value: string; label: string }[];
+      showIf?: (values: Values) => boolean;
     };
 
 export type Values = Record<string, string>;
@@ -145,7 +159,9 @@ export function EntryPanel<K extends DatasetKey>({
           hint={config.hint}
         />
         <form onSubmit={handleSubmit} className="space-y-3">
-          {config.fields.map((field) => (
+          {config.fields
+            .filter((field) => field.showIf?.(values) ?? true)
+            .map((field) => (
             <Field
               key={field.name}
               label={field.label}

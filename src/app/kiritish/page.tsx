@@ -41,6 +41,7 @@ const SOCIAL_CONFIG: DatasetConfig<"social"> = {
       label: "Obunachilar",
       type: "number",
       hint: "Kun oxiridagi umumiy soni",
+      showIf: (v) => v.platform !== "instagram_story",
     },
     { name: "reach", label: "Qamrov", type: "number", hint: "Shu kunlik" },
     {
@@ -48,8 +49,20 @@ const SOCIAL_CONFIG: DatasetConfig<"social"> = {
       label: "Faollik",
       type: "number",
       hint: "Like + izoh + saqlash + ulashish",
+      showIf: (v) => v.platform !== "instagram_story",
     },
-    { name: "posts", label: "Postlar soni", type: "number" },
+    {
+      name: "posts",
+      label: "Postlar soni",
+      type: "number",
+      showIf: (v) => v.platform !== "instagram_story",
+    },
+    {
+      name: "posts",
+      label: "Storieslar soni",
+      type: "number",
+      showIf: (v) => v.platform === "instagram_story",
+    },
   ],
   defaults: {
     platform: "instagram",
@@ -61,9 +74,11 @@ const SOCIAL_CONFIG: DatasetConfig<"social"> = {
   toEntry: (values) => ({
     date: values.date,
     platform: values.platform as SocialPlatform,
-    followers: toNumber(values.followers),
+    followers:
+      values.platform === "instagram_story" ? 0 : toNumber(values.followers),
     reach: toNumber(values.reach),
-    engagement: toNumber(values.engagement),
+    engagement:
+      values.platform === "instagram_story" ? 0 : toNumber(values.engagement),
     posts: toNumber(values.posts),
   }),
   toValues: (row) => ({
