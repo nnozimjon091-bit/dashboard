@@ -20,14 +20,7 @@ import type { DashboardData, DatasetKey } from "@/lib/types";
 
 export type FieldSpec =
   | { name: string; label: string; type: "date" }
-  | {
-      name: string;
-      label: string;
-      type: "text";
-      placeholder?: string;
-      /** Berilsa, input yoniga taklif ro'yxati (datalist) qo'shiladi — tanlash ham, qo'lda yozish ham mumkin. */
-      suggestions?: { value: string; label: string }[];
-    }
+  | { name: string; label: string; type: "text"; placeholder?: string }
   | { name: string; label: string; type: "number"; step?: string; hint?: string }
   | {
       name: string;
@@ -170,32 +163,18 @@ export function EntryPanel<K extends DatasetKey>({
                   ))}
                 </Select>
               ) : (
-                <>
-                  <Input
-                    type={field.type === "text" ? "text" : field.type}
-                    list={
-                      field.type === "text" && field.suggestions
-                        ? `${field.name}-suggestions`
-                        : undefined
-                    }
-                    inputMode={field.type === "number" ? "decimal" : undefined}
-                    step={field.type === "number" ? (field.step ?? "1") : undefined}
-                    min={field.type === "number" ? 0 : undefined}
-                    placeholder={
-                      field.type === "text" ? field.placeholder : undefined
-                    }
-                    value={values[field.name] ?? ""}
-                    onChange={(event) => set(field.name, event.target.value)}
-                    required={field.type === "date"}
-                  />
-                  {field.type === "text" && field.suggestions ? (
-                    <datalist id={`${field.name}-suggestions`}>
-                      {field.suggestions.map((option) => (
-                        <option key={option.value} value={option.label} />
-                      ))}
-                    </datalist>
-                  ) : null}
-                </>
+                <Input
+                  type={field.type === "text" ? "text" : field.type}
+                  inputMode={field.type === "number" ? "decimal" : undefined}
+                  step={field.type === "number" ? (field.step ?? "1") : undefined}
+                  min={field.type === "number" ? 0 : undefined}
+                  placeholder={
+                    field.type === "text" ? field.placeholder : undefined
+                  }
+                  value={values[field.name] ?? ""}
+                  onChange={(event) => set(field.name, event.target.value)}
+                  required={field.type === "date"}
+                />
               )}
             </Field>
           ))}
