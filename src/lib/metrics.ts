@@ -354,6 +354,8 @@ export interface VideoKpis {
   subscribers: number;
   subscriberGrowth: number;
   avgViewMinutes: number;
+  videos: number;
+  shorts: number;
 }
 
 export function videoKpis(rows: VideoEntry[]): VideoKpis {
@@ -368,6 +370,8 @@ export function videoKpis(rows: VideoEntry[]): VideoKpis {
     subscribers,
     subscriberGrowth: subscribers - startSubs,
     avgViewMinutes: safeDiv(watchHours * 60, views),
+    videos: sum(rows, (r) => r.videos),
+    shorts: sum(rows, (r) => r.shorts),
   };
 }
 

@@ -222,6 +222,18 @@ const VIDEO_CONFIG: DatasetConfig<"video"> = {
       type: "select",
       options: VIDEO_PLATFORMS,
     },
+    {
+      name: "videos",
+      label: "Videolar soni",
+      type: "number",
+      hint: "Shu kuni chiqarilgan uzun videolar",
+    },
+    {
+      name: "shorts",
+      label: "Shorts soni",
+      type: "number",
+      hint: "Shu kuni chiqarilgan shorts/reels",
+    },
     { name: "views", label: "Ko'rishlar", type: "number", hint: "Shu kunlik" },
     {
       name: "subscribers",
@@ -239,6 +251,8 @@ const VIDEO_CONFIG: DatasetConfig<"video"> = {
   ],
   defaults: {
     platform: "youtube",
+    videos: "",
+    shorts: "",
     views: "",
     subscribers: "",
     watchHours: "",
@@ -247,6 +261,8 @@ const VIDEO_CONFIG: DatasetConfig<"video"> = {
   toEntry: (values) => ({
     date: values.date,
     platform: values.platform as VideoPlatform,
+    videos: toNumber(values.videos),
+    shorts: toNumber(values.shorts),
     views: toNumber(values.views),
     subscribers: toNumber(values.subscribers),
     watchHours: toNumber(values.watchHours),
@@ -255,6 +271,8 @@ const VIDEO_CONFIG: DatasetConfig<"video"> = {
   toValues: (row) => ({
     date: row.date,
     platform: row.platform,
+    videos: String(row.videos),
+    shorts: String(row.shorts),
     views: String(row.views),
     subscribers: String(row.subscribers),
     watchHours: String(row.watchHours),
@@ -268,6 +286,18 @@ const VIDEO_CONFIG: DatasetConfig<"video"> = {
       key: "platform",
       label: "Platforma",
       render: (row) => labelFor(VIDEO_PLATFORMS, row.platform),
+    },
+    {
+      key: "videos",
+      label: "Video",
+      align: "right",
+      render: (row) => num(row.videos),
+    },
+    {
+      key: "shorts",
+      label: "Shorts",
+      align: "right",
+      render: (row) => num(row.shorts),
     },
     {
       key: "views",

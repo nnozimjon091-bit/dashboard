@@ -55,6 +55,11 @@ export default function VideoPage() {
     return { platform: platform.label, ...videoKpis(rows) };
   });
 
+  const ytKpi = videoKpis(current.video.filter((row) => row.platform === "youtube"));
+  const prevYtKpi = videoKpis(
+    previous.video.filter((row) => row.platform === "youtube"),
+  );
+
   if (isEmpty) {
     return (
       <div className="space-y-5">
@@ -279,10 +284,54 @@ export default function VideoPage() {
                     align: "right",
                     render: (row) => num(row.likes),
                   },
+                  {
+                    key: "videos",
+                    label: "Video",
+                    align: "right",
+                    render: (row) => num(row.videos),
+                  },
+                  {
+                    key: "shorts",
+                    label: "Shorts",
+                    align: "right",
+                    render: (row) => num(row.shorts),
+                  },
                 ]}
               />
             </Card>
           </div>
+
+          <section>
+            <SectionTitle
+              title="YouTube"
+              hint="videolar, shorts, ko'rishlar va obunachilar o'sishi"
+            />
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <StatTile
+                label="Videolar soni"
+                value={num(ytKpi.videos)}
+                delta={delta(ytKpi.videos, prevYtKpi.videos)}
+              />
+              <StatTile
+                label="Shorts soni"
+                value={num(ytKpi.shorts)}
+                delta={delta(ytKpi.shorts, prevYtKpi.shorts)}
+              />
+              <StatTile
+                label="Ko'rishlar"
+                value={compact(ytKpi.views)}
+                delta={delta(ytKpi.views, prevYtKpi.views)}
+              />
+              <StatTile
+                label="Yangi obunachilar"
+                value={
+                  (ytKpi.subscriberGrowth >= 0 ? "+" : "") +
+                  num(ytKpi.subscriberGrowth)
+                }
+                delta={delta(ytKpi.subscriberGrowth, prevYtKpi.subscriberGrowth)}
+              />
+            </div>
+          </section>
         </>
       )}
     </div>

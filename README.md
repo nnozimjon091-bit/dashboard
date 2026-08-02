@@ -25,9 +25,9 @@ npm run start
 | Sahifa | Nima ko'rsatadi |
 |---|---|
 | **Umumiy ko'rinish** | Daromad, xarajat, ROAS, CAC, lidlar, konversiya, auditoriya o'sishi, tagida operatorlar bo'limi |
-| **Ijtimoiy tarmoq** | Instagram va Telegram: obunachilar, qamrov, faollik (ER) |
+| **Ijtimoiy tarmoq** | Instagram va Telegram: obunachilar, qamrov, faollik (ER); Instagram Story alohida kartochkada |
 | **Reklama** | To'rt bo'lim: Umumiy, Meta Ads, Google Ads, Klinikalar katalogi |
-| **Video** | YouTube va TikTok: ko'rishlar, obunachilar, ko'rish soatlari |
+| **Video** | YouTube va TikTok: ko'rishlar, obunachilar, ko'rish soatlari; YouTube uchun alohida bo'lim (videolar, shorts, yangi obunachilar) |
 | **Sotuv va lidlar** | Lid → bitim yo'li, kanallarning daromadga hissasi |
 | **Ma'lumot kiritish** | Kunlik ko'rsatkichlarni qo'shish va tahrirlash |
 | **Sozlamalar** | Mavzu, zaxira nusxa (JSON), CSV eksport, demo/tozalash |
@@ -43,9 +43,9 @@ marta kiritsangiz, yangi yozuv qo'shilmaydi — eskisi yangilanadi.
 
 | Bo'lim | Maydonlar |
 |---|---|
-| Ijtimoiy tarmoq | sana, platforma, obunachilar (kun oxiriga), qamrov, faollik, postlar |
+| Ijtimoiy tarmoq | sana, platforma (Instagram / Telegram / Instagram Story), obunachilar (kun oxiriga), qamrov, faollik, postlar |
 | Reklama | sana, platforma, kampaniya, xarajat, ko'rsatishlar, kliklar, lidlar |
-| Video | sana, platforma, ko'rishlar, obunachilar (kun oxiriga), ko'rish soatlari, likelar |
+| Video | sana, platforma, videolar soni, shorts soni, ko'rishlar, obunachilar (kun oxiriga), ko'rish soatlari, likelar |
 | Sotuv | sana, kanal, lidlar, bitimlar, daromad |
 | Kiruvchi operator | sana, kanal, qo'ng'iroqlar, sotuvlar |
 | Chiquvchi operator | sana, lidlar, bitimlar |

@@ -121,6 +121,8 @@ export function buildDemoData(days = 90): DashboardData {
       subscribers: ytSubscribers,
       watchHours: Number((ytViews * 0.062 * jitter(0.3)).toFixed(1)),
       likes: Math.round(ytViews * 0.041 * jitter(0.4)),
+      videos: Math.round(0.6 * weekend * jitter(0.8)),
+      shorts: Math.round(2.2 * weekend * jitter(0.6)),
     });
 
     ttSubscribers += Math.round(26 * growth * jitter(1.3));
@@ -133,6 +135,8 @@ export function buildDemoData(days = 90): DashboardData {
       subscribers: ttSubscribers,
       watchHours: Number((ttViews * 0.0085 * jitter(0.3)).toFixed(1)),
       likes: Math.round(ttViews * 0.052 * jitter(0.4)),
+      videos: 0,
+      shorts: Math.round(1.4 * weekend * jitter(0.7)),
     });
 
     // ── Sotuv va lidlar ──

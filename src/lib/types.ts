@@ -1,7 +1,7 @@
 // Marketing dashboard uchun ma'lumot modellari.
 // Barcha yozuvlar kunlik: bitta sana + bitta platforma = bitta yozuv.
 
-export type SocialPlatform = "instagram" | "telegram";
+export type SocialPlatform = "instagram" | "telegram" | "instagram_story";
 export type AdsPlatform = "meta" | "google" | "tiktok" | "telegram";
 export type VideoPlatform = "youtube" | "tiktok";
 export type SalesSource =
@@ -42,6 +42,8 @@ export interface VideoEntry {
   subscribers: number; // kun oxiridagi obunachilar
   watchHours: number; // ko'rish soatlari
   likes: number;
+  videos: number; // shu kuni chiqarilgan (uzun) videolar soni
+  shorts: number; // shu kuni chiqarilgan shorts/reels soni
 }
 
 export interface SalesEntry {
@@ -115,6 +117,7 @@ export const EMPTY_DATA: DashboardData = {
 export const SOCIAL_PLATFORMS: { value: SocialPlatform; label: string }[] = [
   { value: "instagram", label: "Instagram" },
   { value: "telegram", label: "Telegram" },
+  { value: "instagram_story", label: "Instagram Story" },
 ];
 
 export const ADS_PLATFORMS: { value: AdsPlatform; label: string }[] = [

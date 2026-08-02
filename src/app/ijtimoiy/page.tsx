@@ -61,6 +61,10 @@ export default function SocialPage() {
     return { platform: platform.label, ...socialKpis(rows) };
   });
 
+  const storyKpi = socialKpis(
+    current.social.filter((row) => row.platform === "instagram_story"),
+  );
+
   if (isEmpty) {
     return (
       <div className="space-y-5">
@@ -74,7 +78,7 @@ export default function SocialPage() {
     <div className="space-y-5">
       <PageHeader
         title="Ijtimoiy tarmoq"
-        description="Instagram va Telegram: auditoriya, qamrov va faollik."
+        description="Instagram, Telegram va Instagram Story: auditoriya, qamrov va faollik."
       />
 
       {isRangeEmpty ? (
@@ -279,9 +283,31 @@ export default function SocialPage() {
                 ]}
               />
             </Card>
+
+            <Card>
+              <SectionTitle
+                title="Instagram Story"
+                hint="tanlangan davr bo'yicha"
+              />
+              <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <Mini label="Qamrov" value={compact(storyKpi.reach)} />
+                <Mini label="Faollik" value={compact(storyKpi.engagement)} />
+                <Mini label="ER" value={pct(storyKpi.er)} />
+                <Mini label="Postlar" value={num(storyKpi.posts)} />
+              </dl>
+            </Card>
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function Mini({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-xs text-ink-3">{label}</dt>
+      <dd className="mt-0.5 font-semibold">{value}</dd>
     </div>
   );
 }
