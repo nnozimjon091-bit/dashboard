@@ -5,12 +5,13 @@ export type SocialPlatform = "instagram" | "telegram";
 export type AdsPlatform = "meta" | "google" | "tiktok" | "telegram";
 export type VideoPlatform = "youtube" | "tiktok";
 export type SalesSource =
-  | "instagram"
-  | "telegram"
+  | "maps"
+  | "instagram_facebook"
   | "youtube"
-  | "tiktok"
-  | "google"
-  | "boshqa";
+  | "telegram"
+  | "facebook"
+  | "target"
+  | "website_google_ads";
 
 export interface SocialEntry {
   id: string;
@@ -130,12 +131,13 @@ export const VIDEO_PLATFORMS: { value: VideoPlatform; label: string }[] = [
 ];
 
 export const SALES_SOURCES: { value: SalesSource; label: string }[] = [
-  { value: "instagram", label: "Instagram" },
-  { value: "telegram", label: "Telegram" },
+  { value: "maps", label: "Kartalar" },
+  { value: "instagram_facebook", label: "Instagram / Facebook" },
   { value: "youtube", label: "YouTube" },
-  { value: "tiktok", label: "TikTok" },
-  { value: "google", label: "Google" },
-  { value: "boshqa", label: "Boshqa" },
+  { value: "telegram", label: "Telegram" },
+  { value: "facebook", label: "Facebook" },
+  { value: "target", label: "Target" },
+  { value: "website_google_ads", label: "Website / Google Ads" },
 ];
 
 export const CATALOG_SOURCES: { value: CatalogSource; label: string }[] = [

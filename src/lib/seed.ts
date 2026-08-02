@@ -137,9 +137,9 @@ export function buildDemoData(days = 90): DashboardData {
 
     // ── Sotuv va lidlar ──
     const mix: { source: SalesEntry["source"]; share: number; check: number }[] = [
-      { source: "instagram", share: 0.4, check: 210 },
+      { source: "instagram_facebook", share: 0.4, check: 210 },
       { source: "telegram", share: 0.26, check: 185 },
-      { source: "google", share: 0.22, check: 260 },
+      { source: "website_google_ads", share: 0.22, check: 260 },
       { source: "youtube", share: 0.12, check: 240 },
     ];
 

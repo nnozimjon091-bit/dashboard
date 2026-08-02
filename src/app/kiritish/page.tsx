@@ -317,7 +317,7 @@ const SALES_CONFIG: DatasetConfig<"sales"> = {
     },
     { name: "revenue", label: "Daromad (USD)", type: "number", step: "0.01" },
   ],
-  defaults: { source: "instagram", leads: "", deals: "", revenue: "" },
+  defaults: { source: "maps", leads: "", deals: "", revenue: "" },
   toEntry: (values) => ({
     date: values.date,
     source: values.source as SalesSource,
@@ -388,7 +388,7 @@ const INBOUND_CONFIG: DatasetConfig<"inbound"> = {
       hint: "Shu qo'ng'iroqlardan chiqqan bitimlar",
     },
   ],
-  defaults: { source: "instagram", calls: "", answered: "", deals: "" },
+  defaults: { source: "maps", calls: "", answered: "", deals: "" },
   toEntry: (values) => ({
     date: values.date,
     source: values.source as SalesSource,
