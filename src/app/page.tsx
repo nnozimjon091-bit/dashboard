@@ -17,7 +17,7 @@ import {
 } from "@/lib/metrics";
 import { seriesColor } from "@/lib/palette";
 import { SERIES_ORDER } from "@/lib/series";
-import { CATALOG_SOURCES, SALES_SOURCES } from "@/lib/types";
+import { CATALOG_SOURCES, LEAD_DIRECTIONS, SALES_SOURCES } from "@/lib/types";
 import { useDashboard } from "@/lib/use-dashboard";
 
 export default function OverviewPage() {
@@ -106,6 +106,16 @@ export default function OverviewPage() {
       ),
     })),
   ]
+    .filter((row) => row.value > 0)
+    .sort((a, b) => b.value - a.value);
+
+  const leadsByDirection = LEAD_DIRECTIONS.map((direction) => ({
+    label: direction.label,
+    value: sum(
+      current.outbound.filter((row) => row.direction === direction.value),
+      (row) => row.leads,
+    ),
+  }))
     .filter((row) => row.value > 0)
     .sort((a, b) => b.value - a.value);
 
@@ -295,7 +305,7 @@ export default function OverviewPage() {
             </ChartCard>
 
             <ChartCard<{ label: string; value: number }>
-              title="Lidlar manba bo'yicha"
+              title="Kiruvchi lidlar — kanal bo'yicha"
               subtitle="tanlangan davrdagi jami"
               table={{
                 rows: leadsBySource,
@@ -313,6 +323,33 @@ export default function OverviewPage() {
             >
               <CategoryBarChart
                 data={leadsBySource}
+                format={(value) => num(value)}
+              />
+            </ChartCard>
+
+            <ChartCard<{ label: string; value: number }>
+              title="Chiquvchi lidlar — yo'nalish bo'yicha"
+              subtitle="tanlangan davrdagi jami"
+              table={{
+                rows: leadsByDirection,
+                rowKey: (row) => row.label,
+                columns: [
+                  {
+                    key: "label",
+                    label: "Yo'nalish",
+                    render: (row) => row.label,
+                  },
+                  {
+                    key: "value",
+                    label: "Lidlar",
+                    align: "right",
+                    render: (row) => num(row.value),
+                  },
+                ],
+              }}
+            >
+              <CategoryBarChart
+                data={leadsByDirection}
                 format={(value) => num(value)}
               />
             </ChartCard>
