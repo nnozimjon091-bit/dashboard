@@ -10,13 +10,14 @@ import {
   adsKpis,
   buildSeries,
   delta,
+  outboundKpis,
   safeDiv,
   salesKpis,
   type SeriesPoint,
 } from "@/lib/metrics";
 import { seriesColor } from "@/lib/palette";
 import { SERIES_ORDER } from "@/lib/series";
-import { SALES_SOURCES } from "@/lib/types";
+import { LEAD_DIRECTIONS, SALES_SOURCES } from "@/lib/types";
 import { useDashboard } from "@/lib/use-dashboard";
 
 export default function SalesPage() {
@@ -52,6 +53,17 @@ export default function SalesPage() {
   const revenueBySource = bySource
     .map((row) => ({ label: row.source, value: row.revenue }))
     .filter((row) => row.value > 0)
+    .sort((a, b) => b.value - a.value);
+
+  const outboundByDirection = LEAD_DIRECTIONS.map((direction) => {
+    const rows = current.outbound.filter(
+      (row) => row.direction === direction.value,
+    );
+    return { direction: direction.label, ...outboundKpis(rows) };
+  }).filter((row) => row.leads > 0);
+
+  const outboundLeadsByDirection = outboundByDirection
+    .map((row) => ({ label: row.direction, value: row.leads }))
     .sort((a, b) => b.value - a.value);
 
   if (isEmpty) {
@@ -274,6 +286,69 @@ export default function SalesPage() {
                     label: "O'rt. chek",
                     align: "right",
                     render: (row) => usdFine(row.avgCheck),
+                  },
+                ]}
+              />
+            </Card>
+
+            <ChartCard<{ label: string; value: number }>
+              title="Chiquvchi lidlar — yo'nalish bo'yicha"
+              subtitle="tanlangan davrdagi jami"
+              table={{
+                rows: outboundLeadsByDirection,
+                rowKey: (row) => row.label,
+                columns: [
+                  {
+                    key: "label",
+                    label: "Yo'nalish",
+                    render: (row) => row.label,
+                  },
+                  {
+                    key: "value",
+                    label: "Lid",
+                    align: "right",
+                    render: (row) => num(row.value),
+                  },
+                ],
+              }}
+            >
+              <CategoryBarChart
+                data={outboundLeadsByDirection}
+                format={(value) => num(value)}
+              />
+            </ChartCard>
+
+            <Card>
+              <SectionTitle
+                title="Chiquvchi — yo'nalish kesimi"
+                hint="tanlangan davr bo'yicha"
+              />
+              <DataTable
+                rows={outboundByDirection}
+                rowKey={(row) => row.direction}
+                columns={[
+                  {
+                    key: "direction",
+                    label: "Yo'nalish",
+                    render: (row) => row.direction,
+                  },
+                  {
+                    key: "leads",
+                    label: "Lid",
+                    align: "right",
+                    render: (row) => num(row.leads),
+                  },
+                  {
+                    key: "deals",
+                    label: "Bitim",
+                    align: "right",
+                    render: (row) => num(row.deals),
+                  },
+                  {
+                    key: "conversion",
+                    label: "Konversiya",
+                    align: "right",
+                    render: (row) => pct(row.conversion),
                   },
                 ]}
               />

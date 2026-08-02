@@ -64,10 +64,23 @@ export interface InboundEntry {
   deals: number; // qo'ng'iroqlardan chiqqan sotuvlar
 }
 
-/** Operatorlar qilgan chiquvchi qo'ng'iroqlar natijasi — kunlik jami. */
+export type LeadDirection =
+  | "urolog"
+  | "dermatolog"
+  | "kardiolog_chekup"
+  | "endokrinolog_chekup"
+  | "uzd"
+  | "nevropatolog"
+  | "stomatolog_breket"
+  | "stomatolog_implant"
+  | "oftalmolog"
+  | "ortoped";
+
+/** Operatorlar qilgan chiquvchi qo'ng'iroqlar natijasi — lead yo'nalishi kesimida. */
 export interface OutboundEntry {
   id: string;
   date: string;
+  direction: LeadDirection;
   leads: number;
   deals: number;
 }
@@ -140,6 +153,19 @@ export const SALES_SOURCES: { value: SalesSource; label: string }[] = [
   { value: "facebook", label: "Facebook" },
   { value: "target", label: "Target" },
   { value: "website_google_ads", label: "Website / Google Ads" },
+];
+
+export const LEAD_DIRECTIONS: { value: LeadDirection; label: string }[] = [
+  { value: "urolog", label: "Urolog" },
+  { value: "dermatolog", label: "Dermatolog" },
+  { value: "kardiolog_chekup", label: "Kardiolog chek-up" },
+  { value: "endokrinolog_chekup", label: "Endokrinolog chek-up" },
+  { value: "uzd", label: "UZD" },
+  { value: "nevropatolog", label: "Nevropatolog" },
+  { value: "stomatolog_breket", label: "Stomatolog breket" },
+  { value: "stomatolog_implant", label: "Stomatolog implant" },
+  { value: "oftalmolog", label: "Oftalmolog" },
+  { value: "ortoped", label: "Ortoped" },
 ];
 
 export const CATALOG_SOURCES: { value: CatalogSource; label: string }[] = [

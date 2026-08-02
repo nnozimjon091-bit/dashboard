@@ -174,12 +174,29 @@ export function buildDemoData(days = 90): DashboardData {
     });
 
     // ── Chiquvchi qo'ng'iroqlar ──
-    const outLeads = Math.max(0, Math.round(18 * weekend * jitter(0.6)));
-    outbound.push({
-      id: `demo-out-${date}`,
-      date,
-      leads: outLeads,
-      deals: Math.max(0, Math.round(outLeads * 0.19 * jitter(0.8))),
+    const outLeadsTotal = Math.max(0, Math.round(18 * weekend * jitter(0.6)));
+    const outboundMix: { direction: OutboundEntry["direction"]; share: number }[] = [
+      { direction: "urolog", share: 0.22 },
+      { direction: "dermatolog", share: 0.18 },
+      { direction: "stomatolog_implant", share: 0.16 },
+      { direction: "uzd", share: 0.14 },
+      { direction: "kardiolog_chekup", share: 0.12 },
+      { direction: "ortoped", share: 0.1 },
+      { direction: "oftalmolog", share: 0.08 },
+    ];
+    outboundMix.forEach(({ direction, share }, order) => {
+      const outLeads = Math.max(
+        0,
+        Math.round(outLeadsTotal * share * jitter(0.6)),
+      );
+      if (outLeads === 0) return;
+      outbound.push({
+        id: `demo-out-${order}-${date}`,
+        date,
+        direction,
+        leads: outLeads,
+        deals: Math.max(0, Math.round(outLeads * 0.19 * jitter(0.8))),
+      });
     });
 
     // ── Klinikalar katalogi ──

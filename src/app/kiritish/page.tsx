@@ -13,12 +13,14 @@ import {
   ADS_PLATFORMS,
   CATALOG_SOURCES,
   labelFor,
+  LEAD_DIRECTIONS,
   MED24_COST_PER_LEAD,
   SALES_SOURCES,
   SOCIAL_PLATFORMS,
   VIDEO_PLATFORMS,
   type AdsPlatform,
   type CatalogSource,
+  type LeadDirection,
   type SalesSource,
   type SocialPlatform,
   type VideoPlatform,
@@ -467,9 +469,15 @@ const INBOUND_CONFIG: DatasetConfig<"inbound"> = {
 const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
   dataset: "outbound",
   title: "Chiquvchi qo'ng'iroqlar",
-  hint: "Operatorlar qilgan qo'ng'iroqlar natijasi, kunlik jami.",
+  hint: "Operatorlar qilgan qo'ng'iroqlar natijasi, lead yo'nalishi kesimida.",
   fields: [
     { name: "date", label: "Sana", type: "date" },
+    {
+      name: "direction",
+      label: "Lead yo'nalishi",
+      type: "select",
+      options: LEAD_DIRECTIONS,
+    },
     {
       name: "leads",
       label: "Lidlar",
@@ -483,20 +491,28 @@ const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
       hint: "Yopilgan sotuvlar",
     },
   ],
-  defaults: { leads: "", deals: "" },
+  defaults: { direction: "urolog", leads: "", deals: "" },
   toEntry: (values) => ({
     date: values.date,
+    direction: values.direction as LeadDirection,
     leads: toNumber(values.leads),
     deals: toNumber(values.deals),
   }),
   toValues: (row) => ({
     date: row.date,
+    direction: row.direction,
     leads: String(row.leads),
     deals: String(row.deals),
   }),
-  isSame: (row, values) => row.date === values.date,
+  isSame: (row, values) =>
+    row.date === values.date && row.direction === values.direction,
   columns: [
     { key: "date", label: "Sana", render: (row) => shortDate(row.date) },
+    {
+      key: "direction",
+      label: "Yo'nalish",
+      render: (row) => labelFor(LEAD_DIRECTIONS, row.direction),
+    },
     {
       key: "leads",
       label: "Lid",

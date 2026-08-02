@@ -28,7 +28,7 @@ npm run start
 | **Ijtimoiy tarmoq** | Instagram va Telegram: obunachilar, qamrov, faollik (ER); Instagram Story alohida kartochkada |
 | **Reklama** | To'rt bo'lim: Umumiy, Meta Ads, Google Ads, Klinikalar katalogi |
 | **Video** | YouTube va TikTok: ko'rishlar, obunachilar, ko'rish soatlari; YouTube uchun alohida bo'lim (videolar, shorts, yangi obunachilar) |
-| **Sotuv va lidlar** | Lid → bitim yo'li, kanallarning daromadga hissasi |
+| **Sotuv va lidlar** | Lid → bitim yo'li, kanallarning daromadga hissasi, chiquvchi lidlarning yo'nalish kesimi |
 | **Ma'lumot kiritish** | Kunlik ko'rsatkichlarni qo'shish va tahrirlash |
 | **Sozlamalar** | Mavzu, zaxira nusxa (JSON), CSV eksport, demo/tozalash |
 
@@ -48,7 +48,7 @@ marta kiritsangiz, yangi yozuv qo'shilmaydi — eskisi yangilanadi.
 | Video | sana, platforma, videolar soni, shorts soni, ko'rishlar, obunachilar (kun oxiriga), ko'rish soatlari, likelar |
 | Sotuv | sana, kanal, lidlar, bitimlar, daromad |
 | Kiruvchi operator | sana, kanal, qo'ng'iroqlar, sotuvlar |
-| Chiquvchi operator | sana, lidlar, bitimlar |
+| Chiquvchi operator | sana, lead yo'nalishi, lidlar, bitimlar |
 | Klinikalar katalogi | sana, katalog (Clinics.uz / Med24), lidlar, bitimlar, daromad, xarajat |
 
 **Muhim:** _Reklama_ bo'limidagi lid — faqat pullik reklamadan kelgan murojaat
@@ -81,8 +81,10 @@ Chiquvchi konversiya  = bitimlar / lidlar
 
 **Operatorlar bo'limi.** _Kiruvchi_ — asosiy raqamga kelgan qo'ng'iroqlar, kanal
 kesimida (jami qo'ng'iroq va shundan chiqqan sotuv). _Chiquvchi_ — operatorlar
-qilgan qo'ng'iroqlarning natijasi, kunlik jami. Ikkalasi Umumiy ko'rinish
-sahifasining oxirida alohida bo'lim bo'lib chiqadi.
+qilgan qo'ng'iroqlarning natijasi, lead yo'nalishi (Urolog, Dermatolog va h.k.)
+kesimida; yo'nalish bo'yicha hisobot _Sotuv va lidlar_ sahifasida chiqadi,
+Umumiy ko'rinishda esa ikkalasi ham umumiy (yo'nalishsiz) jami sifatida,
+sahifaning oxirida alohida bo'lim bo'lib chiqadi.
 
 **Klinikalar katalogi** (Reklama guruhi ichida). Clinics.uz va Med24 kabi
 klinika kataloglaridan kelgan lidlar qo'lda kiritiladi. Sahifada "Barchasi /
