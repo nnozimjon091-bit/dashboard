@@ -1,19 +1,32 @@
 # Marketing Dashboard
 
 Marketing hisobotlarini kunlik yuritish va kuzatish uchun panel. Ma'lumot qo'lda
-kiritiladi va **shu brauzerning `localStorage`ida** saqlanadi — server ham, login
-ham, hech qanday API kalit ham kerak emas.
+kiritiladi va **umumiy bulut bazasida** (Upstash Redis) saqlanadi — barcha
+brauzer va qurilma xuddi shu ma'lumotni ko'radi va tahrirlaydi. Login yo'q:
+link orqali kirgan har kim ko'ra va o'zgartira oladi.
 
 Valyuta: **USD**. Interfeys: **o'zbek tilida**. Yorug'/qorong'i rejim almashtirgich bilan.
 
 ## Ishga tushirish
+
+`.env.local` fayl yarating (`.env.example`ga qarang) va Upstash Redis
+ma'lumotlarini kiriting:
+
+```bash
+UPSTASH_REDIS_REST_URL="https://....upstash.io"
+UPSTASH_REDIS_REST_TOKEN="..."
+```
+
+Bepul Redis bazasini https://upstash.com da (ro'yxatdan o'tib, "Create Database")
+2 daqiqada yaratish mumkin — "REST API" bo'limidan URL va tokenni oling.
 
 ```bash
 npm install
 npm run dev      # http://localhost:3000
 ```
 
-Ishlab chiqarish uchun:
+Ishlab chiqarish uchun (Vercel'ga joylashtirilganda shu 2 ta environment
+variable'ni loyiha sozlamalarida ham qo'shish kerak):
 
 ```bash
 npm run build
@@ -163,25 +176,32 @@ chiqadi. Kunlik kesim uchun hisobotga `День` ustunini qo'shing.
 
 ## Ma'lumot xavfsizligi
 
-Hamma narsa brauzerda turadi, shuning uchun:
+Ma'lumot **umumiy Upstash Redis bazasida** turadi (`/api/data` orqali
+o'qiladi/yoziladi), shuning uchun:
 
-- brauzer ma'lumotlarini tozalasangiz, yozuvlar ham o'chadi;
-- boshqa qurilmada ochilganda ma'lumot ko'rinmaydi.
+- qaysi brauzer yoki qurilmadan kirsangiz ham xuddi shu ma'lumotni ko'rasiz
+  va tahrirlaysiz;
+- **login yo'q** — havola (URL) kimda bo'lsa, o'sha ko'radi va o'zgartira
+  oladi. Havolani faqat ishonchli odamlarga bering;
+- brauzer ma'lumotlarini tozalash endi yozuvlarga ta'sir qilmaydi (ular
+  serverda turadi) — faqat mavzu va filtr sozlamalari mahalliy qoladi;
+- server bilan aloqa uzilsa (internet yo'q, token noto'g'ri va h.k.), sahifa
+  yuqorisida qizil ogohlantirish va "Qayta urinish" tugmasi chiqadi.
 
-**Sozlamalar → Zaxira nusxa** bo'limidan vaqti-vaqti bilan JSON yuklab oling.
-O'sha fayl orqali ma'lumotni istalgan qurilmada tiklash mumkin. Excel uchun
-har bir bo'limni alohida CSV qilib ham yuklab olsa bo'ladi.
+**Sozlamalar → Zaxira nusxa** bo'limidan vaqti-vaqti bilan JSON yuklab oling —
+bu qo'shimcha strahovka (baza o'chib qolsa ham ma'lumot fayl sifatida qoladi).
+Excel uchun har bir bo'limni alohida CSV qilib ham yuklab olsa bo'ladi.
 
-Birinchi ochilganda panel bo'sh turmasligi uchun demo ma'lumot ko'rsatiladi —
-bu haqda yuqorida ogohlantiruvchi qator chiqadi va birinchi o'z yozuvingizni
-kiritganingizda demo belgisi o'chadi.
+Birinchi ochilganda (yoki ma'lumot hali kiritilmagan bo'lsa) panel bo'sh
+turmasligi uchun demo ma'lumot ko'rsatiladi — bu haqda yuqorida ogohlantiruvchi
+qator chiqadi va birinchi o'z yozuvingizni kiritganingizda demo belgisi o'chadi.
 
 ## Texnologiyalar
 
 - Next.js 16 (App Router) + React 19 + TypeScript
 - Tailwind CSS v4 — ranglar CSS o'zgaruvchilari orqali, `data-theme` bilan almashadi
 - Recharts — grafiklar
-- Saqlash: `localStorage`
+- Saqlash: Upstash Redis (`/api/data` route handler orqali, umumiy — login yo'q)
 
 ## Grafiklar bo'yicha qoidalar
 
@@ -202,11 +222,12 @@ Kod ichida quyidagilarga qat'iy amal qilingan:
 ```
 src/
   app/                 sahifalar (App Router)
+    api/data/route.ts  umumiy ma'lumotni o'qish/yozish (Upstash Redis)
   components/          UI va grafik komponentlari
   lib/
     types.ts           ma'lumot modellari
     google-ads.ts      Google Ads hisobotini o'qiydigan parser
-    store.tsx          localStorage'ga bog'langan kontekst
+    store.tsx          /api/data'ga bog'langan umumiy kontekst
     metrics.ts         sana, guruhlash va KPI hisoblari
     palette.ts         grafik ranglari (yorug'/qorong'i)
     format.ts          raqam va sana formatlari

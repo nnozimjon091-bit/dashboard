@@ -85,6 +85,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const {
     hydrated,
     isDemo,
+    loadError,
+    saveError,
+    retryLoad,
     rangeKey,
     range,
     setRangeKey,
@@ -131,6 +134,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         </header>
 
         <main id="asosiy" className="mx-auto max-w-[1400px] px-4 py-5 sm:px-6">
+          {hydrated && loadError ? (
+            <ErrorBanner message={loadError} onRetry={retryLoad} />
+          ) : null}
+          {hydrated && !loadError && saveError ? (
+            <ErrorBanner message={saveError} />
+          ) : null}
           {hydrated && isDemo ? <DemoBanner onClear={clearAll} /> : null}
           {hydrated ? children : <LoadingSkeleton />}
         </main>
@@ -356,6 +365,23 @@ function ThemeToggle() {
     >
       {mode === "dark" ? <IconSun /> : <IconMoon />}
     </Button>
+  );
+}
+
+function ErrorBanner({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry?: () => void;
+}) {
+  return (
+    <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-bad/40 bg-surface px-4 py-3">
+      <p className="mr-auto text-sm text-bad">{message}</p>
+      {onRetry ? (
+        <Button onClick={onRetry}>Qayta urinish</Button>
+      ) : null}
+    </div>
   );
 }
 

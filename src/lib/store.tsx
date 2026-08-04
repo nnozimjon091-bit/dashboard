@@ -1,9 +1,11 @@
 "use client";
 
-// Ma'lumot brauzerning localStorage'ida saqlanadi — server ham, login ham kerak emas.
+// Ma'lumot umumiy serverda (Upstash Redis, /api/data orqali) saqlanadi —
+// barcha brauzer va qurilmalar shu bitta manbadan o'qiydi/yozadi. Login yo'q:
+// link orqali kirgan har kim bir xil ma'lumotni ko'radi va tahrirlaydi.
 //
 // Demo ma'lumot — bu alohida KO'RINISH rejimi, saqlanadigan yozuv emas.
-// U hech qachon localStorage'ga yozilmaydi va foydalanuvchining o'z yozuvlari
+// U hech qachon serverga yozilmaydi va foydalanuvchining o'z yozuvlari
 // bilan aralashmaydi: birinchi haqiqiy yozuv kiritilishi bilan demo yo'qoladi.
 
 import {
@@ -24,7 +26,6 @@ import {
 import { resolveRange, type Range, type RangeKey } from "./metrics";
 import { buildDemoData } from "./seed";
 
-const DATA_KEY = "marketing-dashboard:data:v1";
 const DISMISSED_KEY = "marketing-dashboard:demo-dismissed:v1";
 /** Eski versiya kaliti: "1" = demo yoqilgan, "0" = foydalanuvchi uni yopgan. */
 const LEGACY_DEMO_KEY = "marketing-dashboard:demo:v1";
@@ -41,10 +42,16 @@ interface StoreValue {
   data: DashboardData;
   /** Faqat foydalanuvchi kiritgan yozuvlar (demo hech qachon bu yerda bo'lmaydi). */
   ownData: DashboardData;
-  /** localStorage o'qib bo'lingunicha false — shu paytgacha skeleton ko'rsatiladi. */
+  /** Umumiy serverdan o'qib bo'lingunicha false — shu paytgacha skeleton ko'rsatiladi. */
   hydrated: boolean;
   /** Ekrandagi raqamlar haqiqiy emas, demo ekanini bildiradi. */
   isDemo: boolean;
+  /** Umumiy serverdan ma'lumot o'qib bo'lmasa shu yerga xabar tushadi. */
+  loadError: string | null;
+  /** Oxirgi saqlash urinishi muvaffaqiyatsiz bo'lsa shu yerga xabar tushadi. */
+  saveError: string | null;
+  /** Serverdan qayta o'qib ko'rish (yuklash xato bergandan keyin). */
+  retryLoad: () => void;
   rangeKey: RangeKey;
   range: Range;
   setRangeKey: (key: RangeKey) => void;
@@ -93,9 +100,9 @@ export function countRows(data: DashboardData): number {
 }
 
 /**
- * Oldingi versiyalarda demo yozuvlari localStorage'ga tushib qolar edi.
- * O'qishda ularni tashlab yuboramiz — aks holda ular "haqiqiy" ma'lumot
- * sifatida grafiklarga qo'shilib ketadi.
+ * Oldingi versiyalarda demo yozuvlari saqlanib qolar edi. O'qishda ularni
+ * tashlab yuboramiz — aks holda ular "haqiqiy" ma'lumot sifatida
+ * grafiklarga qo'shilib ketadi.
  */
 function stripDemoRows(data: DashboardData): DashboardData {
   const clean = <T extends { id: string }>(rows: T[]) =>
@@ -110,25 +117,6 @@ function stripDemoRows(data: DashboardData): DashboardData {
   };
 }
 
-/** Noma'lum yoki buzilgan JSON'ni xavfsiz o'qish. */
-function readStored(): DashboardData | null {
-  try {
-    const raw = localStorage.getItem(DATA_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<DashboardData>;
-    return stripDemoRows({
-      social: Array.isArray(parsed.social) ? parsed.social : [],
-      ads: Array.isArray(parsed.ads) ? parsed.ads : [],
-      video: Array.isArray(parsed.video) ? parsed.video : [],
-      sales: Array.isArray(parsed.sales) ? parsed.sales : [],
-      outbound: Array.isArray(parsed.outbound) ? parsed.outbound : [],
-      catalogs: Array.isArray(parsed.catalogs) ? parsed.catalogs : [],
-    });
-  } catch {
-    return null;
-  }
-}
-
 function readDismissed(): boolean {
   const current = localStorage.getItem(DISMISSED_KEY);
   if (current !== null) return current === "1";
@@ -140,18 +128,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [ownData, setOwnData] = useState<DashboardData>(EMPTY_DATA);
   const [demoDismissed, setDemoDismissed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
   const [rangeKey, setRangeKeyState] = useState<RangeKey>("30");
   // Bo'sh qiymatlar server va mijoz renderini bir xil qiladi; hydratsiyadan
   // keyin saqlangani yoki standart (oxirgi 30 kun) qo'yiladi.
   const [customRange, setCustomRangeState] = useState<Range>({ from: "", to: "" });
 
-  // Birinchi render serverdagi natijaga mos bo'lishi shart, shuning uchun
-  // localStorage faqat mount'dan keyin o'qiladi. Effekt bir marta ishlaydi —
-  // qayta-qayta render zanjiri hosil bo'lmaydi.
+  // Filtr va "demo yopilgan" holati — brauzerga xos, tezkor UI sozlamasi,
+  // shuning uchun bular hamon localStorage'da qoladi (ma'lumotning o'zi emas).
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const stored = readStored();
-    if (stored) setOwnData(stored);
     setDemoDismissed(readDismissed());
     const storedRange = localStorage.getItem(RANGE_KEY) as RangeKey | null;
     if (storedRange) setRangeKeyState(storedRange);
@@ -164,14 +152,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         // buzilgan qiymat — e'tiborsiz qoldiramiz
       }
     }
-    setHydrated(true);
   }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
+  // Haqiqiy ma'lumot — umumiy serverdan o'qiladi, shuning uchun har qanday
+  // brauzer/qurilma xuddi shu yozuvlarni ko'radi.
   useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(DATA_KEY, JSON.stringify(ownData));
-  }, [ownData, hydrated]);
+    let cancelled = false;
+    setHydrated(false);
+    fetch("/api/data")
+      .then((res) => {
+        if (!res.ok) throw new Error("load failed");
+        return res.json() as Promise<DashboardData>;
+      })
+      .then((json) => {
+        if (cancelled) return;
+        setOwnData(stripDemoRows(json));
+        setLoadError(null);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setLoadError(
+          "Ma'lumotni umumiy serverdan yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.",
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setHydrated(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadToken]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!hydrated) return;
@@ -187,6 +198,34 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!hydrated) return;
     localStorage.setItem(CUSTOM_RANGE_KEY, JSON.stringify(customRange));
   }, [customRange, hydrated]);
+
+  // Har bir o'zgarish umumiy serverga yoziladi — shu tufayli boshqa
+  // brauzer/qurilma ham xuddi shu ma'lumotni ko'radi.
+  useEffect(() => {
+    if (!hydrated) return;
+    let cancelled = false;
+    fetch("/api/data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(ownData),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("save failed");
+        if (!cancelled) setSaveError(null);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSaveError(
+            "Oxirgi o'zgarish umumiy serverga saqlanmadi. Internetni tekshiring.",
+          );
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [ownData, hydrated]);
+
+  const retryLoad = useCallback(() => setReloadToken((n) => n + 1), []);
 
   // Demo har seansda qaytadan yasaladi (sanalari bugunga nisbatan) va
   // hech qayerga saqlanmaydi.
@@ -295,6 +334,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       ownData,
       hydrated,
       isDemo,
+      loadError,
+      saveError,
+      retryLoad,
       rangeKey,
       range,
       setRangeKey,
@@ -314,6 +356,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       ownData,
       hydrated,
       isDemo,
+      loadError,
+      saveError,
+      retryLoad,
       rangeKey,
       range,
       setRangeKey,
