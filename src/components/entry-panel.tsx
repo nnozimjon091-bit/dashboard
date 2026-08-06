@@ -65,6 +65,8 @@ export function toNumber(value: string): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+const PAGE_SIZE = 25;
+
 export function EntryPanel<K extends DatasetKey>({
   config,
 }: {
@@ -79,10 +81,18 @@ export function EntryPanel<K extends DatasetKey>({
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const rows = [...ownData[config.dataset]].sort((a, b) =>
     b.date.localeCompare(a.date),
   ) as DashboardData[K][number][];
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageRows = rows.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   const set = (name: string, value: string) =>
     setValues((current) => ({ ...current, [name]: value }));
@@ -112,6 +122,7 @@ export function EntryPanel<K extends DatasetKey>({
       } else {
         addEntry(config.dataset, entry as never);
         setNotice("Yozuv qo'shildi.");
+        setPage(1);
       }
     }
     reset();
@@ -218,15 +229,43 @@ export function EntryPanel<K extends DatasetKey>({
       <Card>
         <SectionTitle
           title="Kiritilgan yozuvlar"
-          hint={`${rows.length} ta yozuv, eng yangisi yuqorida`}
+          hint={`${rows.length} ta yozuv, eng yangisi yuqorida — ${currentPage}/${totalPages}-sahifa`}
         />
         <DataTable
-          rows={rows.slice(0, 60)}
+          rows={pageRows}
           rowKey={(row) => row.id}
           columns={columnsWithActions}
           emptyText="Hozircha yozuv yo'q"
           maxHeight="520px"
         />
+        {totalPages > 1 ? (
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-1">
+            <Button
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() => setPage(currentPage - 1)}
+            >
+              Oldingi
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <Button
+                key={n}
+                size="sm"
+                variant={n === currentPage ? "primary" : "ghost"}
+                onClick={() => setPage(n)}
+              >
+                {n}
+              </Button>
+            ))}
+            <Button
+              size="sm"
+              disabled={currentPage === totalPages}
+              onClick={() => setPage(currentPage + 1)}
+            >
+              Keyingi
+            </Button>
+          </div>
+        ) : null}
       </Card>
     </div>
   );
