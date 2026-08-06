@@ -454,9 +454,8 @@ const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
     },
     {
       name: "revenue",
-      label: "Daromad (USD)",
+      label: "Daromad (so'm)",
       type: "number",
-      step: "0.01",
       hint: "Shu yo'nalishdagi bitimlardan tushgan daromad",
     },
   ],
@@ -466,14 +465,14 @@ const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
     direction: values.direction as LeadDirection,
     leads: toNumber(values.leads),
     deals: toNumber(values.deals),
-    revenue: toNumber(values.revenue),
+    revenue: Number((toNumber(values.revenue) / USD_TO_UZS).toFixed(2)),
   }),
   toValues: (row) => ({
     date: row.date,
     direction: row.direction,
     leads: String(row.leads),
     deals: String(row.deals),
-    revenue: String(row.revenue),
+    revenue: String(Math.round(row.revenue * USD_TO_UZS)),
   }),
   isSame: (row, values) =>
     row.date === values.date && row.direction === values.direction,
@@ -506,7 +505,7 @@ const OUTBOUND_CONFIG: DatasetConfig<"outbound"> = {
       key: "revenue",
       label: "Daromad",
       align: "right",
-      render: (row) => usd(row.revenue, 2),
+      render: (row) => som(row.revenue),
     },
   ],
 };
