@@ -38,6 +38,20 @@ export function usdFine(value: number): string {
   return "$" + num(value, value < 10 ? 2 : 0);
 }
 
+/** Taxminiy kurs (2026 avgust holatiga), USD qiymatlarni so'mga o'girish uchun. */
+const USD_TO_UZS = 12_000;
+
+/** Hero va stat-tile raqamlar uchun, so'mda: 812,8M so'm */
+export function somCompact(usdValue: number): string {
+  return compact(usdValue * USD_TO_UZS) + " so'm";
+}
+
+/** Jadval va o'rtacha chek kabi to'liq summalar uchun: 1 800 000 so'm */
+export function som(usdValue: number): string {
+  if (!Number.isFinite(usdValue)) return "—";
+  return num(usdValue * USD_TO_UZS) + " so'm";
+}
+
 /** 0.0432 → "4,3%" */
 export function pct(value: number, digits = 1): string {
   if (!Number.isFinite(value)) return "—";

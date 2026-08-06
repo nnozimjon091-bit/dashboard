@@ -5,7 +5,7 @@ import { CategoryBarChart, ColumnChart, TrendChart } from "@/components/charts";
 import { NoData, NoDataInRange } from "@/components/no-data";
 import { HeroStat, StatTile } from "@/components/stat-tile";
 import { Card, DataTable, PageHeader, SectionTitle } from "@/components/ui";
-import { num, pct, ratio, usd, usdCompact, usdFine } from "@/lib/format";
+import { num, pct, ratio, som, somCompact, usd, usdFine } from "@/lib/format";
 import {
   adsKpis,
   buildSeries,
@@ -123,7 +123,7 @@ export default function SalesPage() {
         <>
           <HeroStat
             label="Daromad"
-            value={usdCompact(totalRevenue)}
+            value={somCompact(totalRevenue)}
             delta={delta(totalRevenue, prevTotalRevenue)}
             caption="oldingi davrga nisbatan · sotuv + chiquvchi operator"
           >
@@ -139,7 +139,7 @@ export default function SalesPage() {
               <div>
                 <dt className="text-xs text-ink-3">Sof foyda</dt>
                 <dd className="mt-0.5 font-semibold">
-                  {usd(totalRevenue - ads.spend)}
+                  {som(totalRevenue - ads.spend)}
                 </dd>
               </div>
             </dl>
@@ -164,7 +164,7 @@ export default function SalesPage() {
             />
             <StatTile
               label="O'rtacha chek"
-              value={usdFine(totalAvgCheck)}
+              value={som(totalAvgCheck)}
               delta={delta(totalAvgCheck, prevTotalAvgCheck)}
             />
             <StatTile
@@ -181,7 +181,7 @@ export default function SalesPage() {
             />
             <StatTile
               label="Sof foyda"
-              value={usdCompact(totalRevenue - ads.spend)}
+              value={somCompact(totalRevenue - ads.spend)}
               delta={delta(
                 totalRevenue - ads.spend,
                 prevTotalRevenue - prevAds.spend,
@@ -197,7 +197,7 @@ export default function SalesPage() {
           <div className="grid gap-4 xl:grid-cols-2">
             <ChartCard<SeriesPoint>
               title="Daromad dinamikasi"
-              subtitle="USD"
+              subtitle="so'm"
               table={{
                 rows: revenue,
                 rowKey: (row) => String(row.key),
@@ -207,7 +207,7 @@ export default function SalesPage() {
                     key: "revenue",
                     label: "Daromad",
                     align: "right",
-                    render: (row) => usd(Number(row.revenue)),
+                    render: (row) => som(Number(row.revenue)),
                   },
                 ],
               }}
@@ -215,7 +215,7 @@ export default function SalesPage() {
               <TrendChart
                 data={revenue}
                 fill
-                format={(value) => usdCompact(value)}
+                format={(value) => somCompact(value)}
                 series={[
                   { key: "revenue", name: "Daromad", color: tokens.series[0] },
                 ]}
@@ -234,14 +234,14 @@ export default function SalesPage() {
                     key: "value",
                     label: "Daromad",
                     align: "right",
-                    render: (row) => usd(row.value),
+                    render: (row) => som(row.value),
                   },
                 ],
               }}
             >
               <CategoryBarChart
                 data={revenueBySource}
-                format={(value) => usdCompact(value)}
+                format={(value) => somCompact(value)}
               />
             </ChartCard>
 
@@ -314,13 +314,13 @@ export default function SalesPage() {
                     key: "revenue",
                     label: "Daromad",
                     align: "right",
-                    render: (row) => usd(row.revenue),
+                    render: (row) => som(row.revenue),
                   },
                   {
                     key: "avgCheck",
                     label: "O'rt. chek",
                     align: "right",
-                    render: (row) => usdFine(row.avgCheck),
+                    render: (row) => som(row.avgCheck),
                   },
                 ]}
               />
