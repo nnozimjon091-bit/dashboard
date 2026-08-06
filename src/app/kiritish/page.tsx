@@ -7,7 +7,7 @@ import {
   type DatasetConfig,
 } from "@/components/entry-panel";
 import { Card, cx, PageHeader } from "@/components/ui";
-import { num, pct, shortDate, usd } from "@/lib/format";
+import { num, pct, shortDate, som, usd, USD_TO_UZS } from "@/lib/format";
 import { safeDiv } from "@/lib/metrics";
 import {
   ADS_PLATFORMS,
@@ -381,7 +381,7 @@ const SALES_CONFIG: DatasetConfig<"sales"> = {
       type: "number",
       hint: "Yopilgan sotuvlar",
     },
-    { name: "revenue", label: "Daromad (USD)", type: "number", step: "0.01" },
+    { name: "revenue", label: "Daromad (so'm)", type: "number" },
   ],
   defaults: { source: "maps", leads: "", deals: "", revenue: "" },
   toEntry: (values) => ({
@@ -389,14 +389,14 @@ const SALES_CONFIG: DatasetConfig<"sales"> = {
     source: values.source as SalesSource,
     leads: toNumber(values.leads),
     deals: toNumber(values.deals),
-    revenue: toNumber(values.revenue),
+    revenue: Number((toNumber(values.revenue) / USD_TO_UZS).toFixed(2)),
   }),
   toValues: (row) => ({
     date: row.date,
     source: row.source,
     leads: String(row.leads),
     deals: String(row.deals),
-    revenue: String(row.revenue),
+    revenue: String(Math.round(row.revenue * USD_TO_UZS)),
   }),
   isSame: (row, values) =>
     row.date === values.date && row.source === values.source,
@@ -423,7 +423,7 @@ const SALES_CONFIG: DatasetConfig<"sales"> = {
       key: "revenue",
       label: "Daromad",
       align: "right",
-      render: (row) => usd(row.revenue, 2),
+      render: (row) => som(row.revenue),
     },
   ],
 };
